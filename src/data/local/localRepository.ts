@@ -3,7 +3,6 @@ import type {
   ApprovalDecision,
   Asset,
   Comment,
-  GenerationJob,
   GraphEdge,
   GraphNode,
   Invitation,
@@ -17,17 +16,17 @@ import type {
 import type { AIProvider, ImageInput } from '@/core/ai';
 import { JobEngine, type EngineOptions, type JobStore, type SubmitResult } from '@/core/jobEngine';
 import { assertCan, can } from '@/core/permissions';
-import { buildApprovedBundle, resolveInputs, validateGraph, type ApprovedBundle, type GraphContext, type ImageRef } from '@/core/graph';
+import { buildApprovedBundle, resolveInputs, validateGraph, type GraphContext, type ImageRef } from '@/core/graph';
 import { normalizeNodeData } from '@/core/nodeRegistry';
 import { UPLOAD_LIMITS } from '@/core/schemas';
 import { hashBytes } from '@/core/hash';
 import type { PendingAsset } from '@/core/executors';
 import { MockProvider } from '@/ai/mockProvider';
+import { createExportExecutor, passthroughRasterizer, type Rasterizer } from '@/features/export/executor';
 import {
   ConflictError,
   NotFoundError,
   type CreateProjectInput,
-  type ExportRecordInput,
   type ProjectSummary,
   type RepoEvent,
   type Repository,
@@ -52,6 +51,8 @@ export interface LocalRepoOptions {
   channel?: Broadcast | null;
   probeImage?: (blob: Blob) => Promise<{ width: number; height: number } | null>;
   engine?: EngineOptions;
+  /** Turns images into JPEG/PNG for the PDF export. Defaults to JPEG/PNG passthrough. */
+  rasterize?: Rasterizer;
   /** Create and sign in a default owner on first run (browser UX). */
   autoProvisionOwner?: boolean;
 }
@@ -74,6 +75,7 @@ function roleOf(members: ProjectMember[], projectId: string, userId: string | nu
 
 export class LocalRepository implements Repository {
   readonly mode = 'local' as const;
+  readonly authMode = 'local' as const;
   readonly providerLabel: string;
   private readonly store: TableStore;
   private readonly session: SessionStore;
@@ -92,8 +94,18 @@ export class LocalRepository implements Repository {
     this.autoProvision = opts.autoProvisionOwner ?? false;
     const provider = opts.provider ?? new MockProvider({ latencyMs: 700 });
     this.providerLabel = provider.id === 'mock' ? 'Mock AI · offline' : provider.id;
+    const exportExecutor = createExportExecutor({
+      rasterize: opts.rasterize ?? passthroughRasterizer,
+      loadMeta: async (projectId) => {
+        const t = await this.store.read(['projects', 'profiles']);
+        const project = t.projects.find((p) => p.id === projectId);
+        if (!project) throw new NotFoundError('Project not found');
+        return { project, names: Object.fromEntries(t.profiles.map((p) => [p.id, p.displayName])) };
+      },
+    });
     this.engine = new JobEngine(this.jobStore(), provider, {
       ...opts.engine,
+      internalExecutors: { 'export:export': exportExecutor, ...opts.engine?.internalExecutors },
       onChange: (job) => {
         this.emit({ projectId: job.projectId, kind: 'jobs' });
         opts.engine?.onChange?.(job);
@@ -231,19 +243,19 @@ export class LocalRepository implements Repository {
           projectId,
           storageKey,
           mimeType: p.mimeType,
-          width: p.width,
-          height: p.height,
+          width: p.width || null,
+          height: p.height || null,
           sizeBytes: p.bytes.byteLength,
           role: p.role,
-          sourceType: 'ai_generated',
+          sourceType: p.sourceType ?? 'ai_generated',
           parentAssetId: p.parentAssetId,
           versionOf: p.versionOf,
           version: p.version,
           nodeId: meta.nodeId,
           jobId: meta.jobId,
           label: p.label,
-          prompt: p.prompt,
-          originalFilename: null,
+          prompt: p.prompt || null,
+          originalFilename: p.filename ?? null,
           contentHash: hashBytes(p.bytes),
           createdBy: meta.createdBy,
           createdAt: new Date().toISOString(),
@@ -297,7 +309,7 @@ export class LocalRepository implements Repository {
           const imgs = (resolveInputs(ctx, n.id).images as ImageRef[] | undefined) ?? [];
           pending += buildApprovedBundle(n.id, imgs, ctx.approvals).pendingAssetIds.length;
         }
-        return { project, myRole: m.role, coverAssetId: cover?.id ?? null, nodeCount: ctx.nodes.length, pendingReviews: pending };
+        return { project, myRole: m.role, coverAsset: cover ?? null, nodeCount: ctx.nodes.length, pendingReviews: pending };
       })
       .filter((x): x is ProjectSummary => !!x)
       .sort((a, b) => (a.project.updatedAt < b.project.updatedAt ? 1 : -1));
@@ -457,7 +469,7 @@ export class LocalRepository implements Repository {
     return b.bytes;
   }
 
-  async assetUrl(asset: Asset): Promise<string> {
+  async assetUrl(asset: Asset, _opts?: { download?: boolean }): Promise<string> {
     const cached = this.urlCache.get(asset.id);
     if (cached) return cached;
     const bytes = await this.assetBytes(asset);
@@ -479,86 +491,6 @@ export class LocalRepository implements Repository {
     if (!job) throw new NotFoundError('Job not found');
     await this.requireRole(job.projectId, 'job.cancel');
     await this.engine.cancel(jobId);
-  }
-
-  async recordExport(projectId: string, input: ExportRecordInput): Promise<Asset> {
-    const { user } = await this.requireRole(projectId, 'export.create');
-    const ctx = await this.graphContext(projectId);
-    const node = ctx.nodes.find((n) => n.id === input.nodeId && n.type === 'export');
-    if (!node) throw new NotFoundError('Export node not found');
-    if (input.mode === 'final') {
-      const approved = resolveInputs(ctx, node.id).approved as ApprovedBundle | undefined;
-      if (!approved?.assetIds.length) throw new Error('A final pack needs at least one client-approved image. Export a draft instead.');
-    }
-    const now = new Date().toISOString();
-    const jobId = crypto.randomUUID();
-    const assetId = crypto.randomUUID();
-    const storageKey = `${projectId}/exports/${assetId}.pdf`;
-    await this.store.putBlob(storageKey, input.bytes, 'application/pdf');
-    const asset: Asset = {
-      id: assetId,
-      projectId,
-      storageKey,
-      mimeType: 'application/pdf',
-      width: null,
-      height: null,
-      sizeBytes: input.bytes.byteLength,
-      role: 'export',
-      sourceType: 'export',
-      parentAssetId: null,
-      versionOf: null,
-      version: 1,
-      nodeId: node.id,
-      jobId,
-      label: input.filename,
-      prompt: null,
-      originalFilename: input.filename,
-      contentHash: hashBytes(input.bytes),
-      createdBy: user.id,
-      createdAt: now,
-    };
-    const job: GenerationJob = {
-      id: jobId,
-      projectId,
-      nodeId: node.id,
-      nodeType: 'export',
-      operation: 'export',
-      status: 'succeeded',
-      provider: 'internal',
-      model: 'jspdf',
-      inputSnapshot: input.inputSnapshot,
-      inputHash: input.inputHash,
-      promptVersion: 'export.v1',
-      idempotencyKey: `export:${jobId}`,
-      attempts: 1,
-      maxAttempts: 1,
-      error: null,
-      outputAssetIds: [assetId],
-      usage: null,
-      requestedBy: user.id,
-      createdAt: now,
-      startedAt: now,
-      finishedAt: now,
-      updatedAt: now,
-    };
-    await this.store.mutate(['assets', 'jobs', 'runs', 'activity'], (t) => {
-      t.assets.push(asset);
-      t.jobs.push(job);
-      t.runs.push({
-        id: crypto.randomUUID(),
-        jobId,
-        projectId,
-        nodeId: node.id,
-        operation: 'export',
-        inputHash: input.inputHash,
-        outputAssetIds: [assetId],
-        output: { assetId, mode: input.mode, filename: input.filename, pageCount: input.pageCount },
-        completedAt: now,
-      });
-      this.activity(t, { projectId, actorId: user.id, action: 'export.create', entityType: 'asset', entityId: assetId, meta: { mode: input.mode, filename: input.filename } });
-    });
-    this.emit({ projectId, kind: 'graph' });
-    return asset;
   }
 
   // ------------------------------------------------------------ review

@@ -252,23 +252,43 @@ describe('end-to-end: brief → concepts → poses → shot plan → client appr
 
     await client.recordApproval(p.id, v2.id, 'approved');
 
-    // Export: a final pack is refused if nothing approved, accepted otherwise
+    // Export runs as a job: the PDF is stored before the job succeeds.
     const exportNode = byType(b.nodes, 'export');
-    const asset = await owner.recordExport(p.id, {
-      nodeId: exportNode.id,
-      bytes: new TextEncoder().encode('%PDF-1.4 test'),
-      filename: 'pack.pdf',
-      mode: 'final',
-      inputHash: 'h',
-      inputSnapshot: {},
-      pageCount: 5,
-    });
-    expect(asset.role).toBe('export');
-    b = await owner.loadProject(p.id);
-    expect(b.runs.some((r) => r.operation === 'export')).toBe(true);
-    expect(b.activity.map((a) => a.action)).toEqual(expect.arrayContaining(['project.create', 'asset.upload', 'job.succeeded', 'approval.approved', 'approval.changes_requested', 'member.join', 'export.create']));
+    b = await save(owner, b, patchNode(b, exportNode.id, { mode: 'final' }));
+    b = await run(owner, b, exportNode.id, 'export');
+    const pdf = b.assets.find((a) => a.role === 'export')!;
+    expect(pdf.mimeType).toBe('application/pdf');
+    expect(pdf.sourceType).toBe('export');
+    const bytes = await owner.assetBytes(pdf);
+    expect(new TextDecoder().decode(bytes.slice(0, 5))).toBe('%PDF-');
+    const exportRun = b.runs.find((r) => r.operation === 'export')!;
+    expect(exportRun.outputAssetIds).toEqual([pdf.id]);
+    expect((exportRun.output as { mode: string }).mode).toBe('final');
+    expect(b.activity.map((a) => a.action)).toEqual(
+      expect.arrayContaining(['project.create', 'asset.upload', 'job.succeeded', 'approval.approved', 'approval.changes_requested', 'member.join', 'export.create']),
+    );
 
-    await expect(client.recordExport(p.id, { nodeId: exportNode.id, bytes: new Uint8Array([1]), filename: 'x.pdf', mode: 'draft', inputHash: 'h', inputSnapshot: {}, pageCount: 1 })).rejects.toBeInstanceOf(PermissionError);
+    // Reviewers cannot export.
+    await expect(client.runNode(p.id, exportNode.id, 'export', { idempotencyKey: 'x' })).rejects.toBeInstanceOf(PermissionError);
+  });
+
+  it('refuses a final export when nothing is approved', async () => {
+    const { make } = makeWorld();
+    const owner = make();
+    await owner.signIn('julian@accurova.local');
+    const p = await owner.createProject({ name: 'P', client: 'C', template: 'campaign' });
+    let b = await owner.loadProject(p.id);
+    const exportNode = byType(b.nodes, 'export');
+    b = await save(owner, b, patchNode(b, exportNode.id, { mode: 'final' }));
+    const r = await owner.runNode(p.id, exportNode.id, 'export', { idempotencyKey: 'f' });
+    await owner.engine.whenIdle();
+    const job = (await owner.loadProject(p.id)).jobs.find((j) => j.id === r.job.id)!;
+    expect(job.status).toBe('failed');
+    expect(job.error?.message).toMatch(/final pack needs/);
+    // A draft is fine.
+    b = await save(owner, await owner.loadProject(p.id), patchNode(await owner.loadProject(p.id), exportNode.id, { mode: 'draft' }));
+    b = await run(owner, b, exportNode.id, 'export');
+    expect(b.assets.some((a) => a.role === 'export')).toBe(true);
   });
 
   it('refuses to edit original product photographs', async () => {

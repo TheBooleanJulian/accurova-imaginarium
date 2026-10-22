@@ -16,7 +16,7 @@ import type { Brief } from '@/core/schemas';
 export interface ProjectSummary {
   project: Project;
   myRole: Role;
-  coverAssetId: string | null;
+  coverAsset: Asset | null;
   nodeCount: number;
   pendingReviews: number;
 }
@@ -50,18 +50,11 @@ export interface CreateProjectInput {
   brief?: Partial<Brief>;
 }
 
-export interface ExportRecordInput {
-  nodeId: string;
-  bytes: Uint8Array;
-  filename: string;
-  mode: 'draft' | 'final';
-  inputHash: string;
-  inputSnapshot: unknown;
-  pageCount: number;
-}
 
 export interface Repository {
-  readonly mode: 'local' | 'supabase';
+  readonly mode: 'local' | 'server';
+  /** How people sign in: browser-local profiles, server dev login (email only), or Supabase Auth. */
+  readonly authMode: 'local' | 'dev' | 'supabase';
   /** Human label for the AI backend, shown in the UI so mock output is never mistaken for real. */
   readonly providerLabel: string;
 
@@ -82,12 +75,12 @@ export interface Repository {
   saveGraph(projectId: string, graph: { nodes: GraphNode[]; edges: GraphEdge[] }, baseRevision: number): Promise<{ revision: number }>;
 
   uploadAsset(projectId: string, file: Blob, meta: { role: 'product' | 'brand' | 'reference'; filename: string; nodeId?: string }): Promise<Asset>;
-  assetUrl(asset: Asset): Promise<string>;
+  /** A short-lived URL for displaying (or, with `download`, saving) an asset. */
+  assetUrl(asset: Asset, opts?: { download?: boolean }): Promise<string>;
   assetBytes(asset: Asset): Promise<Uint8Array>;
 
   runNode(projectId: string, nodeId: string, operation: string, opts: { force?: boolean; idempotencyKey: string }): Promise<SubmitResult>;
   cancelJob(jobId: string): Promise<void>;
-  recordExport(projectId: string, input: ExportRecordInput): Promise<Asset>;
 
   addComment(projectId: string, input: { assetId?: string | null; nodeId?: string | null; body: string }): Promise<Comment>;
   resolveComment(commentId: string, resolved: boolean): Promise<void>;

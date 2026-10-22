@@ -248,6 +248,16 @@ export class JobEngine {
       entityId: job.id,
       meta: { nodeId: job.nodeId, operation: job.operation, error: updated.error?.message },
     });
+    if (updated.status === 'succeeded' && job.nodeType === 'export') {
+      await this.store.logActivity({
+        projectId: job.projectId,
+        actorId: job.requestedBy,
+        action: 'export.create',
+        entityType: 'asset',
+        entityId: updated.outputAssetIds[0] ?? job.id,
+        meta: { jobId: job.id, mode: (job.inputSnapshot as { config?: { mode?: string } })?.config?.mode },
+      });
+    }
     return updated;
   }
 

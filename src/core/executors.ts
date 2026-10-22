@@ -1,4 +1,4 @@
-import type { AssetRole, GraphNode, UsageInfo } from './types';
+import type { AssetRole, AssetSource, GraphNode, UsageInfo } from './types';
 import type { AIProvider, ImageInput } from './ai';
 import { throwIfAborted, ProviderError } from './ai';
 import type { DirectionValue, ImageRef, InputSnapshot, TextValue } from './graph';
@@ -30,6 +30,10 @@ export interface PendingAsset {
   version: number;
   label: string;
   prompt: string;
+  /** Defaults to `ai_generated`. Exports use `export`. */
+  sourceType?: AssetSource;
+  /** Download name (exports). */
+  filename?: string;
 }
 
 export interface ExecResult {

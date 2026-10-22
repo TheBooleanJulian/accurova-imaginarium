@@ -1,0 +1,120 @@
+@import "tailwindcss";
+
+@theme {
+  --color-void: #050508;
+  --color-ink: #0a0e14;
+  --color-panel: #0e131b;
+  --color-raised: #131a24;
+  --color-line: #1d2632;
+  --color-line-2: #2a3544;
+  --color-mute: #6b7787;
+  --color-soft: #9aa4b2;
+  --color-text: #e6eaf0;
+  --color-teal: #00d4c8;
+  --color-teal-dim: #00d4c81f;
+  --color-gold: #f5c842;
+  --color-gold-dim: #f5c8421f;
+  --color-ok: #7ce38b;
+  --color-warn: #f5a742;
+  --color-err: #ff6b6b;
+  --font-sans: "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--color-void);
+  color: var(--color-text);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+::selection {
+  background: #00d4c855;
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-line-2) transparent;
+}
+
+.label-mono {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-mute);
+}
+
+.checker {
+  background-image: linear-gradient(45deg, #11161e 25%, transparent 25%), linear-gradient(-45deg, #11161e 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, #11161e 75%), linear-gradient(-45deg, transparent 75%, #11161e 75%);
+  background-size: 12px 12px;
+  background-position: 0 0, 0 6px, 6px -6px, -6px 0;
+}
+
+/* ---------- React Flow, re-skinned ---------- */
+.react-flow {
+  --xy-background-color: var(--color-void);
+  --xy-edge-stroke: #3a4656;
+  --xy-edge-stroke-selected: var(--color-teal);
+  --xy-connectionline-stroke: var(--color-teal);
+  --xy-minimap-background-color: var(--color-ink);
+  --xy-controls-button-background-color: var(--color-panel);
+  --xy-controls-button-background-color-hover: var(--color-raised);
+  --xy-controls-button-color: var(--color-soft);
+  --xy-controls-button-border-color: var(--color-line);
+  --xy-selection-background-color: #00d4c814;
+  --xy-selection-border: 1px dashed var(--color-teal);
+  --xy-attribution-background-color: transparent;
+}
+.react-flow__edge-path {
+  stroke-width: 1.6;
+}
+.react-flow__edge.selected .react-flow__edge-path {
+  stroke-width: 2.4;
+}
+.react-flow__handle {
+  width: 11px;
+  height: 11px;
+  border: 2px solid var(--color-void);
+}
+.react-flow__handle.connectingfrom,
+.react-flow__handle.valid {
+  box-shadow: 0 0 0 3px #00d4c855;
+}
+.react-flow__controls {
+  box-shadow: none;
+  border: 1px solid var(--color-line);
+  border-radius: 10px;
+  overflow: hidden;
+}
+.react-flow__minimap {
+  border: 1px solid var(--color-line);
+  border-radius: 10px;
+  overflow: hidden;
+}
+.react-flow__resize-control.handle {
+  background: var(--color-teal);
+  border: none;
+  width: 8px;
+  height: 8px;
+}
+.react-flow__resize-control.line {
+  border-color: transparent;
+}
+
+@keyframes pulse-ring {
+  0% { box-shadow: 0 0 0 0 #00d4c866; }
+  70% { box-shadow: 0 0 0 10px #00d4c800; }
+  100% { box-shadow: 0 0 0 0 #00d4c800; }
+}
+.running-glow {
+  animation: pulse-ring 1.6s ease-out infinite;
+}

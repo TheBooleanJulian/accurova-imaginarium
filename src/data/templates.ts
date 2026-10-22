@@ -30,15 +30,16 @@ export function makeEdge(projectId: string, source: GraphNode, sourcePort: strin
 /** The standard Accurova preshoot pipeline, pre-wired. */
 export function campaignTemplate(projectId: string, userId: string, brief: Partial<Brief> = {}): { nodes: GraphNode[]; edges: GraphEdge[] } {
   const n = (type: NodeType, x: number, y: number, data: Record<string, unknown> = {}) => makeNode(projectId, type, { x, y }, userId, data);
+  // Columns 420 apart, rows sized for each node's preview so nothing overlaps as outputs arrive.
   const briefNode = n('brief', 0, 0, brief);
-  const product = n('image_asset', 0, 470, { title: 'Product photos', role: 'product' });
-  const refs = n('image_asset', 0, 720, { title: 'Inspiration', role: 'reference' });
-  const analysis = n('reference_analysis', 380, 620);
-  const concept = n('concept_generator', 760, 220);
-  const pose = n('pose_generator', 1160, 40);
-  const planner = n('shot_planner', 1160, 470);
-  const approval = n('approval', 1560, 220);
-  const exp = n('export', 1940, 260);
+  const product = n('image_asset', 0, 300, { title: 'Product photos', role: 'product' });
+  const refs = n('image_asset', 0, 560, { title: 'Inspiration', role: 'reference' });
+  const analysis = n('reference_analysis', 420, 520);
+  const concept = n('concept_generator', 840, 140);
+  const pose = n('pose_generator', 1260, -60);
+  const planner = n('shot_planner', 1260, 420);
+  const approval = n('approval', 1680, 160);
+  const exp = n('export', 2100, 200);
   const e = (s: GraphNode, sp: string, t: GraphNode, tp: string) => makeEdge(projectId, s, sp, t, tp);
   return {
     nodes: [briefNode, product, refs, analysis, concept, pose, planner, approval, exp],

@@ -249,6 +249,8 @@ export const NODE_DEFS: Record<NodeType, NodeDef> = {
       notes: z.string().default(''),
       /** Photographer's edits. Excluded from the hash: editing never marks the planner stale. */
       editedPlan: ShotPlanSchema.nullable().default(null),
+      /** The generated run the manual edits started from. */
+      editedFromRunId: z.string().nullable().default(null),
       pinned,
     }),
     operations: [
