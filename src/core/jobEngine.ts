@@ -20,11 +20,25 @@ export interface JobStore {
   insertRun(run: NodeRun): Promise<void>;
   loadImage(projectId: string, ref: ImageRef): Promise<ImageInput>;
   logActivity(e: { projectId: string; actorId: string; action: string; entityType: string; entityId: string; meta?: Record<string, unknown> }): Promise<void>;
+
+  // ---- Optional: multi-process queues (the Postgres store implements these). ----
+  /** Atomically take a due queued job (or one whose lease expired). Undefined if another worker got it. */
+  claimJob?(jobId: string, workerId: string): Promise<GenerationJob | undefined>;
+  /** Ids of jobs this worker could pick up now, respecting per-project limits. */
+  listRunnable?(limit: number): Promise<string[]>;
+  /** Extend this worker's lease; reports a cancel requested from elsewhere. */
+  heartbeat?(jobId: string, workerId: string): Promise<{ cancelRequested: boolean }>;
+  /** Cancel atomically: queued → cancelled now; running → flag for its worker. */
+  requestCancel?(jobId: string): Promise<GenerationJob | undefined>;
 }
 
 export type InternalExecutor = (ctx: Omit<ExecContext, 'provider'> & { job: GenerationJob; graph: GraphContext }) => Promise<ExecResult>;
 
 export interface EngineOptions {
+  /** Identifies this process when claiming jobs from a shared queue. */
+  workerId?: string;
+  /** How often a running job renews its lease and checks for remote cancellation. */
+  heartbeatMs?: number;
   concurrency?: number;
   maxAttempts?: number;
   baseDelayMs?: number;
@@ -76,6 +90,7 @@ export class JobEngine {
   private readonly store: JobStore;
   private readonly provider: AIProvider;
   private readonly opts: Required<Omit<EngineOptions, 'onChange' | 'internalExecutors'>> & Pick<EngineOptions, 'onChange' | 'internalExecutors'>;
+  readonly workerId: string;
   private readonly queue: string[] = [];
   private readonly controllers = new Map<string, AbortController>();
   private running = 0;
@@ -84,7 +99,10 @@ export class JobEngine {
   constructor(store: JobStore, provider: AIProvider, opts: EngineOptions = {}) {
     this.store = store;
     this.provider = provider;
+    this.workerId = opts.workerId ?? `w-${Math.random().toString(36).slice(2, 10)}`;
     this.opts = {
+      workerId: this.workerId,
+      heartbeatMs: opts.heartbeatMs ?? 10_000,
       concurrency: opts.concurrency ?? 2,
       maxAttempts: opts.maxAttempts ?? 3,
       baseDelayMs: opts.baseDelayMs ?? 800,
@@ -202,14 +220,50 @@ export class JobEngine {
   async cancel(jobId: string): Promise<GenerationJob | undefined> {
     const job = await this.store.getJob(jobId);
     if (!job || !ACTIVE.has(job.status)) return job;
-    const qi = this.queue.indexOf(jobId);
-    if (qi >= 0) this.queue.splice(qi, 1);
     const ctrl = this.controllers.get(jobId);
     if (ctrl) {
       ctrl.abort();
       return job; // the worker records the cancellation
     }
+    const qi = this.queue.indexOf(jobId);
+    if (qi >= 0) this.queue.splice(qi, 1);
+    if (this.store.requestCancel) {
+      // Shared queue: another worker may hold it. Let the database decide atomically.
+      const updated = await this.store.requestCancel(jobId);
+      if (updated?.status === 'cancelled') {
+        this.opts.onChange?.(updated);
+        await this.store.logActivity({
+          projectId: job.projectId,
+          actorId: job.requestedBy,
+          action: 'job.cancelled',
+          entityType: 'job',
+          entityId: job.id,
+          meta: { nodeId: job.nodeId, operation: job.operation },
+        });
+      }
+      return updated;
+    }
     return this.finish(job, { status: 'cancelled', error: { message: 'Cancelled by user' } });
+  }
+
+  /** Shared queue: pick up due jobs submitted by any process. Returns how many were taken on. */
+  async poll(): Promise<number> {
+    if (!this.store.listRunnable) return 0;
+    const capacity = this.opts.concurrency - this.running - this.queue.length;
+    if (capacity <= 0) return 0;
+    const ids = await this.store.listRunnable(capacity);
+    let n = 0;
+    for (const id of ids) {
+      if (this.controllers.has(id) || this.queue.includes(id)) continue;
+      this.enqueue(id);
+      n++;
+    }
+    return n;
+  }
+
+  /** Jobs currently queued or running in this process. */
+  get load(): number {
+    return this.running + this.queue.length;
   }
 
   /** Resolves once nothing is queued or running (tests, graceful shutdown). */
@@ -261,24 +315,41 @@ export class JobEngine {
     return updated;
   }
 
+  /** Move a queued job to running: atomically when the store supports claiming. */
+  private async start(jobId: string, current: GenerationJob): Promise<GenerationJob | undefined> {
+    if (this.store.claimJob) return this.store.claimJob(jobId, this.workerId);
+    if (current.status !== 'queued') return undefined;
+    const now = this.opts.now().toISOString();
+    return this.store.updateJob(jobId, { status: 'running', attempts: current.attempts + 1, startedAt: current.startedAt ?? now, updatedAt: now });
+  }
+
   private async work(jobId: string): Promise<void> {
     let job = await this.store.getJob(jobId);
-    if (!job || job.status !== 'queued') return;
+    if (!job || job.status !== 'queued') {
+      // A shared queue may hand us a running job whose previous worker died (expired lease).
+      if (!job || !this.store.claimJob || job.status !== 'running') return;
+    }
     const ctrl = new AbortController();
     this.controllers.set(jobId, ctrl);
+    let beat: ReturnType<typeof setInterval> | null = null;
+    if (this.store.heartbeat) {
+      beat = setInterval(() => {
+        void this.store
+          .heartbeat!(jobId, this.workerId)
+          .then((h) => h.cancelRequested && ctrl.abort())
+          .catch(() => undefined);
+      }, this.opts.heartbeatMs);
+    }
     try {
       while (true) {
-        const now = this.opts.now().toISOString();
-        job = await this.store.updateJob(jobId, {
-          status: 'running',
-          attempts: job.attempts + 1,
-          startedAt: job.startedAt ?? now,
-          updatedAt: now,
-        });
+        const claimed = await this.start(jobId, job);
+        if (!claimed) return; // someone else has it, or it was cancelled meanwhile
+        job = claimed;
         this.opts.onChange?.(job);
         try {
           const result = await this.execute(job, ctrl.signal);
           if (ctrl.signal.aborted) throw new CancelledError();
+          if (this.store.heartbeat && (await this.store.heartbeat(jobId, this.workerId)).cancelRequested) throw new CancelledError();
           // Persist every output durably BEFORE the job can be marked successful.
           const assets: Asset[] = [];
           for (const pending of result.assets) {
@@ -319,9 +390,15 @@ export class JobEngine {
           const pe = err instanceof ProviderError ? err : null;
           const error = { message: (err as Error).message || 'Unknown error', code: pe?.code ?? 'internal_error', retryable: !!pe?.retryable };
           if (error.retryable && job.attempts < job.maxAttempts) {
-            job = await this.store.updateJob(jobId, { status: 'queued', error, updatedAt: this.opts.now().toISOString() });
-            this.opts.onChange?.(job);
             const delay = this.opts.baseDelayMs * 2 ** (job.attempts - 1) * (0.75 + Math.random() * 0.5);
+            const now = this.opts.now();
+            job = await this.store.updateJob(jobId, {
+              status: 'queued',
+              error,
+              updatedAt: now.toISOString(),
+              runAfter: new Date(now.getTime() + delay).toISOString(),
+            });
+            this.opts.onChange?.(job);
             try {
               await this.opts.sleep(delay, ctrl.signal);
             } catch {
@@ -335,6 +412,7 @@ export class JobEngine {
         }
       }
     } finally {
+      if (beat) clearInterval(beat);
       this.controllers.delete(jobId);
     }
   }

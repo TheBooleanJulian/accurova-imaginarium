@@ -6,3 +6,9 @@ dist
 .DS_Store
 supabase/.temp
 supabase/.branches
+.scratch
+dist-server
+api/index.mjs
+.data
+test-results
+playwright-report

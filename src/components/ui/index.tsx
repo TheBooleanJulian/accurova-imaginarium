@@ -192,22 +192,25 @@ export function Toaster() {
 
 // ------------------------------------------------------------- assets
 
-export function useAssetUrl(asset: Asset | undefined | null): string | null {
+export function useAssetUrl(asset: Asset | undefined | null, thumb = false): string | null {
   const { repo } = useRepo();
   const [url, setUrl] = useState<string | null>(null);
+  const id = asset?.id;
   useEffect(() => {
     let alive = true;
     setUrl(null);
-    if (asset) repo.assetUrl(asset).then((u) => alive && setUrl(u)).catch(() => alive && setUrl(null));
+    if (asset) repo.assetUrl(asset, { thumb }).then((u) => alive && setUrl(u)).catch(() => alive && setUrl(null));
     return () => {
       alive = false;
     };
-  }, [repo, asset]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [repo, id, thumb]);
   return url;
 }
 
-export function AssetImage({ asset, className, alt }: { asset: Asset | undefined | null; className?: string; alt?: string }) {
-  const url = useAssetUrl(asset);
+/** `thumb` loads a small preview (server mode); use it for grids and canvas nodes. */
+export function AssetImage({ asset, className, alt, thumb }: { asset: Asset | undefined | null; className?: string; alt?: string; thumb?: boolean }) {
+  const url = useAssetUrl(asset, thumb);
   if (!url) return <div className={cn('checker animate-pulse', className)} />;
   return <img src={url} alt={alt ?? asset?.label ?? ''} className={cn('object-cover', className)} draggable={false} />;
 }

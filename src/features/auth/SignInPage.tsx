@@ -46,6 +46,7 @@ export function SignInPage({ presetEmail, onDone, title }: { presetEmail?: strin
   };
 
   const local = repo.mode === 'local';
+  const passwordless = repo.authMode !== 'supabase';
 
   return (
     <div className="flex min-h-full items-center justify-center p-6">
@@ -56,6 +57,8 @@ export function SignInPage({ presetEmail, onDone, title }: { presetEmail?: strin
           <p className="mt-1 text-sm text-soft">
             {local ? (
               <>Local mode: accounts live in this browser, so you can test the client experience by signing in as the invited email. <Badge>no password</Badge></>
+            ) : passwordless ? (
+              <>Development sign-in: email only. <Badge>dev server</Badge></>
             ) : (
               'Preshoot moodboards, concepts and shot plans for Accurova clients.'
             )}
@@ -68,9 +71,9 @@ export function SignInPage({ presetEmail, onDone, title }: { presetEmail?: strin
             </Field>
           )}
           <Field label="Email">
-            <Input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required autoFocus autoComplete="email" disabled={!!presetEmail && local} />
+            <Input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required autoFocus autoComplete="email" disabled={!!presetEmail && passwordless} />
           </Field>
-          {!local && (
+          {!passwordless && (
             <Field label="Password">
               <Input type="password" value={password} onChange={(e) => setPassword(e.target.value)} required minLength={8} autoComplete={mode === 'up' ? 'new-password' : 'current-password'} />
             </Field>
@@ -78,15 +81,15 @@ export function SignInPage({ presetEmail, onDone, title }: { presetEmail?: strin
           <Button variant="primary" className="w-full" loading={busy} type="submit">
             {mode === 'up' ? 'Create account' : 'Continue'} <ArrowRight className="size-4" />
           </Button>
-          {!local && repo.signUp && (
+          {!passwordless && repo.signUp && (
             <button type="button" className="w-full text-center text-xs text-soft hover:text-teal" onClick={() => setMode(mode === 'in' ? 'up' : 'in')}>
               {mode === 'in' ? 'New here? Create an account' : 'Already have an account? Sign in'}
             </button>
           )}
         </form>
-        {local && profiles.length > 0 && !presetEmail && (
+        {passwordless && profiles.length > 0 && !presetEmail && (
           <div className="space-y-2">
-            <div className="label-mono">Accounts in this browser</div>
+            <div className="label-mono">{local ? 'Accounts in this browser' : 'Accounts on this dev server'}</div>
             {profiles.map((p) => (
               <button
                 key={p.id}

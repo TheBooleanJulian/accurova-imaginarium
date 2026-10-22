@@ -469,7 +469,7 @@ export class LocalRepository implements Repository {
     return b.bytes;
   }
 
-  async assetUrl(asset: Asset, _opts?: { download?: boolean }): Promise<string> {
+  async assetUrl(asset: Asset, _opts?: { download?: boolean; thumb?: boolean }): Promise<string> {
     const cached = this.urlCache.get(asset.id);
     if (cached) return cached;
     const bytes = await this.assetBytes(asset);

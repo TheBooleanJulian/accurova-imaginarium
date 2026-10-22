@@ -50,12 +50,12 @@ function QuickApprove({ asset, bundle, onOpen }: { asset: Asset; bundle: Project
   const state = approvalStateOf(bundle.approvals, asset.id);
   if (!can(bundle.myRole, 'approval.create')) return null;
   return (
-    <div className="flex gap-1.5">
+    <div className="flex min-w-0 gap-1.5">
       {state !== 'approved' && (
         <Button
           size="sm"
           variant="primary"
-          className="flex-1"
+          className="min-w-0 flex-1 px-2"
           loading={busy}
           onClick={async () => {
             setBusy(true);
@@ -72,8 +72,8 @@ function QuickApprove({ asset, bundle, onOpen }: { asset: Asset; bundle: Project
           <CheckCircle2 className="size-3.5" /> Approve
         </Button>
       )}
-      <Button size="sm" variant="outline" className="flex-1" onClick={onOpen}>
-        {state === 'approved' ? 'Details' : 'Comment / change'}
+      <Button size="sm" variant="outline" className="min-w-0 flex-1 px-2" onClick={onOpen} title="Comment or request changes">
+        <span className="truncate">{state === 'approved' ? 'Details' : 'Comment'}</span>
       </Button>
     </div>
   );
@@ -198,7 +198,7 @@ function Review({ bundle }: { bundle: ProjectBundle }) {
             <div className="grid grid-cols-3 gap-2 sm:grid-cols-5 lg:grid-cols-6">
               {uploads.map((a) => (
                 <button key={a.id} onClick={() => setOpen(a)} className="group relative aspect-square overflow-hidden rounded-lg border border-line">
-                  <AssetImage asset={a} className="h-full w-full" />
+                  <AssetImage asset={a} className="h-full w-full" thumb />
                   <span className="absolute inset-x-0 bottom-0 bg-void/80 px-1.5 py-1 text-left font-mono text-[9.5px] uppercase tracking-wider text-soft">
                     {a.role === 'product' ? 'Real product' : a.role === 'brand' ? 'Brand' : 'Reference'}
                   </span>
@@ -292,22 +292,22 @@ function ShotList({ plan, bundle }: { plan: ShotPlan; bundle: ProjectBundle }) {
   return (
     <section>
       <SectionHead kicker="Production plan" title="Shot list" right={<span className="font-mono text-[11px] text-mute">≈ {Math.round(plan.totalSetupMinutes / 6) / 10} h setup</span>} />
-      <div className="grid gap-2 md:grid-cols-2">
+      <div className="grid min-w-0 gap-2 md:grid-cols-2">
         {plan.shots.map((s) => {
           const ref = s.referenceAssetId ? bundle.assets.find((a) => a.id === s.referenceAssetId) : null;
           return (
-            <div key={s.id} className="flex gap-3 rounded-xl border border-line bg-panel p-3">
-              {ref ? <AssetImage asset={ref} className="size-16 shrink-0 rounded-lg border border-line" /> : <div className="size-16 shrink-0 rounded-lg border border-dashed border-line" />}
+            <div key={s.id} className="flex min-w-0 gap-3 rounded-xl border border-line bg-panel p-3">
+              {ref ? <AssetImage asset={ref} className="size-16 shrink-0 rounded-lg border border-line" thumb /> : <div className="size-16 shrink-0 rounded-lg border border-dashed border-line" />}
               <div className="min-w-0 flex-1 space-y-1">
-                <div className="flex items-center gap-2">
-                  <span className="font-mono text-[11px] text-teal">{s.id}</span>
-                  <span className="truncate text-[13.5px] font-medium">{s.title}</span>
-                  <Badge tone={s.priority === 'must' ? 'gold' : s.priority === 'should' ? 'teal' : 'mute'} className="ml-auto">
+                <div className="flex min-w-0 items-center gap-2">
+                  <span className="shrink-0 font-mono text-[11px] text-teal">{s.id}</span>
+                  <span className="min-w-0 truncate text-[13.5px] font-medium">{s.title}</span>
+                  <Badge tone={s.priority === 'must' ? 'gold' : s.priority === 'should' ? 'teal' : 'mute'} className="ml-auto shrink-0">
                     {s.priority}
                   </Badge>
                 </div>
                 <div className="text-[12px] text-soft">{s.poseDirection}</div>
-                <div className="font-mono text-[10.5px] text-mute">
+                <div className="break-words font-mono text-[10.5px] text-mute">
                   {s.framing} · {s.cameraAngle} · {s.deliverableFormat}
                 </div>
               </div>

@@ -45,10 +45,10 @@ export function UserMenu() {
             <div className="text-sm font-medium">{user.displayName}</div>
             <div className="font-mono text-[11px] text-mute">{user.email}</div>
           </div>
-          {repo.mode === 'local' && (
+          {repo.listLocalProfiles && (
             <>
               <div className="mt-1 border-t border-line px-2 pt-2 label-mono flex items-center gap-1.5">
-                <Users className="size-3" /> Switch account <Badge>local mode</Badge>
+                <Users className="size-3" /> Switch account <Badge>{repo.mode === 'local' ? 'local mode' : 'dev login'}</Badge>
               </div>
               <div className="max-h-56 overflow-auto py-1">
                 {profiles

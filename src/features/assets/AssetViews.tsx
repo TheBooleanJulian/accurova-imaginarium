@@ -36,7 +36,7 @@ export function AssetCard({
   return (
     <div className={cn('group overflow-hidden rounded-lg border bg-ink', selected ? 'border-teal ring-1 ring-teal/40' : 'border-line')}>
       <button type="button" onClick={onClick} className="relative block aspect-square w-full overflow-hidden">
-        <AssetImage asset={asset} className="h-full w-full transition group-hover:scale-[1.02]" />
+        <AssetImage asset={asset} className="h-full w-full transition group-hover:scale-[1.02]" thumb />
         <div className="absolute left-1.5 top-1.5"><ProvenanceBadge asset={asset} /></div>
         {comments > 0 && (
           <span className="absolute bottom-1.5 right-1.5 inline-flex items-center gap-1 rounded-md bg-void/80 px-1.5 py-0.5 font-mono text-[10px] text-soft">

@@ -76,7 +76,7 @@ export interface Repository {
 
   uploadAsset(projectId: string, file: Blob, meta: { role: 'product' | 'brand' | 'reference'; filename: string; nodeId?: string }): Promise<Asset>;
   /** A short-lived URL for displaying (or, with `download`, saving) an asset. */
-  assetUrl(asset: Asset, opts?: { download?: boolean }): Promise<string>;
+  assetUrl(asset: Asset, opts?: { download?: boolean; thumb?: boolean }): Promise<string>;
   assetBytes(asset: Asset): Promise<Uint8Array>;
 
   runNode(projectId: string, nodeId: string, operation: string, opts: { force?: boolean; idempotencyKey: string }): Promise<SubmitResult>;

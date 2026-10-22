@@ -195,13 +195,13 @@ export async function buildPreshootPack(input: PackInput): Promise<PackResult> {
     const cols = 3;
     const rows = 2;
     const gw = (W - 2 * M - (cols - 1) * 6) / cols;
-    const gh = 62;
+    const gh = 57;
     for (let start = 0; start < list.length; start += cols * rows) {
       newPage();
       header(title, start ? `${kicker} (cont.)` : kicker);
       list.slice(start, start + cols * rows).forEach((a, i) => {
         const cx = M + (i % cols) * (gw + 6);
-        const cy = 44 + Math.floor(i / cols) * (gh + 17);
+        const cy = 43 + Math.floor(i / cols) * (gh + 18);
         doc.setFillColor(232, 230, 224).rect(cx, cy, gw, gh, 'F');
         const r = raster.get(a.id);
         if (r) {
@@ -222,7 +222,7 @@ export async function buildPreshootPack(input: PackInput): Promise<PackResult> {
         doc.setFont('helvetica', 'normal').setFontSize(7.5).setTextColor(...INK);
         doc.text((doc.splitTextToSize(safe(line2), gw - 5) as string[]).slice(0, 2), cx + 4, cy + gh + 9.5);
       });
-      doc.setFont('helvetica', 'italic').setFontSize(7).setTextColor(...MUTE).text(safe(title.includes('Real') ? 'Original files, unmodified.' : AI_DISCLAIMER), M, H - 14);
+      doc.setFont('helvetica', 'italic').setFontSize(7).setTextColor(...MUTE).text(safe(title.includes('Real') ? 'Original files, unmodified.' : AI_DISCLAIMER), M, H - 11);
     }
   };
   const statusCaption = (a: Asset): [string, string, [number, number, number]] => {

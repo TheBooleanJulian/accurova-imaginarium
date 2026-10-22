@@ -200,7 +200,7 @@ export function SourcePicker({ node, update, images }: InspectorProps & { images
 }
 
 function ImageThumb({ asset }: { asset: Asset }) {
-  return <AssetImage asset={asset} className="h-full w-full" />;
+  return <AssetImage asset={asset} className="h-full w-full" thumb />;
 }
 
 /**

@@ -77,7 +77,7 @@ export function ProjectsPage() {
                 >
                   <div className="relative aspect-[16/10] overflow-hidden bg-ink">
                     {s.coverAsset ? (
-                      <AssetImage asset={s.coverAsset} className="h-full w-full transition duration-500 group-hover:scale-[1.03]" />
+                      <AssetImage asset={s.coverAsset} className="h-full w-full transition duration-500 group-hover:scale-[1.03]" thumb />
                     ) : (
                       <div className="flex h-full items-center justify-center bg-[radial-gradient(circle_at_30%_20%,#00d4c822,transparent_60%)]">
                         <LayoutTemplate className="size-8 text-line-2" />

@@ -157,6 +157,10 @@ export interface GenerationJob {
   outputAssetIds: string[];
   usage: UsageInfo | null;
   requestedBy: string;
+  /** Set when a cancel arrives while another worker is running the job. */
+  cancelRequested?: boolean;
+  /** Not before (retry backoff). Server queue only. */
+  runAfter?: string;
   createdAt: string;
   startedAt: string | null;
   finishedAt: string | null;

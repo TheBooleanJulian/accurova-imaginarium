@@ -91,9 +91,11 @@ export function ShareDialog({ open, onClose, bundle }: { open: boolean; onClose:
               <CopyLink inv={created} />
             </div>
           )}
-          {repo.mode === 'local' && (
+          {repo.authMode !== 'supabase' && (
             <p className="text-[11px] text-gold">
-              Local mode: everyone shares this browser. Open the link, sign in as the invited email, and you&apos;ll see exactly what your client sees.
+              {repo.mode === 'local'
+                ? 'Local mode: everyone shares this browser. Open the link, sign in as the invited email, and you’ll see exactly what your client sees.'
+                : 'Dev sign-in: open the link in a private window and sign in as the invited email to see exactly what your client sees.'}
             </p>
           )}
         </form>

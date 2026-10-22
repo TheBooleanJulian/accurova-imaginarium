@@ -45,7 +45,7 @@ export function InvitePage({ token }: { token: string }) {
   if (!preview) return <div className="flex h-full items-center justify-center"><Spinner /></div>;
 
   const wrongUser = user && user.email !== preview.email;
-  if (!user || (wrongUser && repo.mode === 'local'))
+  if (!user || (wrongUser && repo.authMode !== 'supabase'))
     return <SignInPage presetEmail={preview.email} title={`Join “${preview.projectName}”`} onDone={() => void refreshUser()} />;
 
   return (

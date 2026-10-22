@@ -53,7 +53,7 @@ function Thumbs({ ids, max = 8 }: { ids: string[]; max?: number }) {
     <div className="grid grid-cols-4 gap-1">
       {assets.slice(0, max).map((a) => (
         <div key={a!.id} className="relative aspect-square overflow-hidden rounded-md border border-line">
-          <AssetImage asset={a} className="h-full w-full" />
+          <AssetImage asset={a} className="h-full w-full" thumb />
           {(() => {
             const s = approvalStateOf(bundle.approvals, a!.id);
             return s !== 'pending' ? <span className={cn('absolute right-1 top-1 size-2 rounded-full', s === 'approved' ? 'bg-ok' : 'bg-err')} /> : null;

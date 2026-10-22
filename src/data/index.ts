@@ -1,7 +1,4 @@
 import type { Repository } from './repository';
-import { LocalRepository } from './local/localRepository';
-import { IndexedDbTableStore } from './local/tableStore';
-import { browserRasterizer } from '@/features/export/rasterize.browser';
 
 /** `server` = talk to the Imaginarium API (Postgres/Supabase + real AI). Anything else = browser-only demo mode. */
 export function backendMode(): 'server' | 'local' {
@@ -28,6 +25,12 @@ export async function createRepository(): Promise<Repository> {
     const { ApiRepository } = await import('./api/apiRepository');
     return ApiRepository.connect(import.meta.env.VITE_API_URL ?? '');
   }
+  // Loaded lazily: server-mode clients never download the local backend or the PDF library.
+  const [{ LocalRepository }, { IndexedDbTableStore }, { browserRasterizer }] = await Promise.all([
+    import('./local/localRepository'),
+    import('./local/tableStore'),
+    import('@/features/export/rasterize.browser'),
+  ]);
   const SESSION_KEY = 'imaginarium.session';
   return new LocalRepository({
     store: new IndexedDbTableStore(),
