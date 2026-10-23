@@ -1,5 +1,5 @@
 import { useEffect, useState, type ReactNode } from 'react';
-import { AlertTriangle, Check, CloudOff, Eye, FileDown, Loader2, Lock, Redo2, Share2, Undo2 } from 'lucide-react';
+import { AlertTriangle, Check, CloudOff, Eye, FileDown, Loader2, Lock, Redo2, Settings2, Share2, Undo2 } from 'lucide-react';
 import { can, ROLE_LABELS } from '@/core/permissions';
 import { Badge, Button, Wordmark, toast } from '@/components/ui';
 import { useRepo } from '@/lib/repoContext';
@@ -8,6 +8,7 @@ import { cn, errMsg } from '@/lib/cn';
 import { UserMenu } from '@/features/auth/UserMenu';
 import { ShareDialog } from '@/features/share/ShareDialog';
 import { ExportDialog } from '@/features/export/ExportDialog';
+import { ProjectSettingsDialog } from '@/features/projects/ProjectSettingsDialog';
 import { useEditor } from './editorContext';
 import type { SaveState } from './useGraphEditor';
 
@@ -26,6 +27,7 @@ export function EditorToolbar() {
   const [name, setName] = useState(bundle.project.name);
   const [share, setShare] = useState(false);
   const [exporting, setExporting] = useState(false);
+  const [settings, setSettings] = useState(false);
   const save = SAVE_UI[editor.saveState];
 
   useEffect(() => setName(bundle.project.name), [bundle.project.name]);
@@ -84,6 +86,9 @@ export function EditorToolbar() {
         <Badge tone={repo.providerLabel.toLowerCase().includes('mock') ? 'gold' : 'teal'} className="hidden md:inline-flex">
           {repo.providerLabel}
         </Badge>
+        <Button variant="ghost" size="icon" onClick={() => setSettings(true)} title="Project settings" aria-label="Project settings">
+          <Settings2 className="size-4" />
+        </Button>
         <Button variant="ghost" size="sm" onClick={() => navigate(`/p/${bundle.project.id}/review`)} title="See what your client sees">
           <Eye className="size-3.5" /> <span className="hidden sm:inline">Client view</span>
         </Button>
@@ -101,6 +106,7 @@ export function EditorToolbar() {
       </div>
       <ShareDialog open={share} onClose={() => setShare(false)} bundle={bundle} />
       <ExportDialog open={exporting} onClose={() => setExporting(false)} />
+      <ProjectSettingsDialog open={settings} onClose={() => setSettings(false)} project={bundle.project} role={bundle.myRole} />
     </header>
   );
 }

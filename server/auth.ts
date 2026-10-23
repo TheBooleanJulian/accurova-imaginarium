@@ -106,8 +106,8 @@ export function createSupabaseAuth(cfg: Config, db: Db, fetchImpl: typeof fetch 
       const hit = cache.get(k);
       if (hit && hit.until > Date.now()) return hit.user;
       let id: string | undefined;
-      let email = '';
-      let name = '';
+      let email: string;
+      let name: string;
       try {
         if (secret) {
           const { payload } = await jwtVerify(token, secret, { audience: 'authenticated' });

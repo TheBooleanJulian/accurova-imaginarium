@@ -108,7 +108,11 @@ export function Canvas() {
       if (sel.length)
         setSelectedEdges((prev) => {
           const next = new Set(prev);
-          for (const c of sel) if (c.type === 'select') (c.selected ? next.add(c.id) : next.delete(c.id));
+          for (const c of sel) {
+            if (c.type !== 'select') continue;
+            if (c.selected) next.add(c.id);
+            else next.delete(c.id);
+          }
           return next;
         });
     },
@@ -166,7 +170,7 @@ export function Canvas() {
         fitViewOptions={{ padding: 0.15, maxZoom: 1 }}
         minZoom={0.15}
         maxZoom={2}
-        proOptions={{ hideAttribution: true }}
+        attributionPosition="top-right"
         colorMode="dark"
       >
         <Background variant={BackgroundVariant.Dots} gap={22} size={1.2} color="#1d2632" />

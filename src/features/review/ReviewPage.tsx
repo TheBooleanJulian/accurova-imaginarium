@@ -50,7 +50,7 @@ function QuickApprove({ asset, bundle, onOpen }: { asset: Asset; bundle: Project
   const state = approvalStateOf(bundle.approvals, asset.id);
   if (!can(bundle.myRole, 'approval.create')) return null;
   return (
-    <div className="flex min-w-0 gap-1.5">
+    <div className="flex min-w-0 flex-col gap-1.5 sm:flex-row">
       {state !== 'approved' && (
         <Button
           size="sm"

@@ -88,6 +88,14 @@ function persistentSecret(dataDir: string, name: string): string {
   return s;
 }
 
+/** Load `.env` from the working directory (Node's built-in loader; real env vars win). */
+export function loadDotEnv(file = '.env'): void {
+  if (!existsSync(file)) return;
+  const before = { ...process.env };
+  process.loadEnvFile(file);
+  for (const [k, v] of Object.entries(before)) process.env[k] = v;
+}
+
 export function loadConfig(source: Record<string, string | undefined> = process.env): Config {
   const parsed = EnvSchema.safeParse(source);
   if (!parsed.success) {

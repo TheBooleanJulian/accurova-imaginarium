@@ -65,6 +65,12 @@ export function ImageAssetInspector({ node, update }: InspectorProps) {
     const list = Array.from(files);
     if (!list.length) return;
     setUploading(list.length);
+    // The server attaches uploads to the saved node, so flush pending graph edits first.
+    try {
+      await editor.save();
+    } catch {
+      /* a conflict/error is shown in the toolbar; the upload itself can still proceed */
+    }
     const added: string[] = [];
     for (const f of list) {
       try {

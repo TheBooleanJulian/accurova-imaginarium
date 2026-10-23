@@ -51,7 +51,16 @@ export function safe(s: unknown): string {
     .replace(/[→⟶]/g, '->')
     .replace(/[≈]/g, '~')
     .replace(/[•]/g, '·')
-    .replace(/[^\x09\x0A\x0D\x20-\x7E -ÿ–—‘’“”…€]/g, '');
+    // Helvetica is WinAnsi-only: keep printable ASCII, Latin-1 and a few typographic marks.
+    // Anything else (e.g. Chinese, emoji) shows as "?" rather than vanishing silently.
+    .replace(/[^\t\n\r\u0020-\u007E\u00A0-\u00FF\u2013\u2014\u2018\u2019\u201C\u201D\u2026\u20AC]+/g, '?');
+}
+
+/** Accurova is in Singapore: dates in packs use SGT whatever the server's clock zone. */
+const TZ = 'Asia/Singapore';
+export function sgDate(d: Date): string {
+  // en-CA formats as YYYY-MM-DD.
+  return new Intl.DateTimeFormat('en-CA', { timeZone: TZ, year: 'numeric', month: '2-digit', day: '2-digit' }).format(d);
 }
 
 function hexRgb(hex: string): [number, number, number] | null {
@@ -63,7 +72,7 @@ function hexRgb(hex: string): [number, number, number] | null {
 
 export function packFilename(project: Project, mode: 'draft' | 'final', now = new Date()): string {
   const slug = `${project.client}-${project.name}`.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 60);
-  const d = now.toISOString().slice(0, 10);
+  const d = sgDate(now);
   return `accurova-${slug || 'project'}-${mode === 'final' ? 'approved-pack' : 'draft'}-${d}.pdf`;
 }
 
@@ -134,7 +143,7 @@ export async function buildPreshootPack(input: PackInput): Promise<PackResult> {
   doc.roundedRect(M, 132, doc.getTextWidth(stamp) * 0.75 + 12, 9, 1.5, 1.5, 'F');
   doc.setFont('helvetica', 'bold').setFontSize(9).setTextColor(...VOID).text(stamp, M + 6, 138);
   const meta = [
-    ['Prepared', now.toLocaleDateString('en-SG', { day: 'numeric', month: 'long', year: 'numeric' })],
+    ['Prepared', now.toLocaleDateString('en-SG', { day: 'numeric', month: 'long', year: 'numeric', timeZone: TZ })],
     ['Prepared by', input.generatedBy],
     ['Direction', direction?.title ?? '—'],
     ['Approved images', String(input.approved?.assetIds.length ?? 0)],
@@ -316,7 +325,7 @@ export async function buildPreshootPack(input: PackInput): Promise<PackResult> {
     doc.setFont('helvetica', 'normal').setTextColor(...INK).text(safe(`${a.label ?? a.id} (v${a.version})`), M + 26, ay);
     const latest = hist[0];
     if (latest) {
-      doc.setTextColor(...MUTE).text(safe(`${latest.reviewerName ?? 'Reviewer'} · ${new Date(latest.createdAt).toLocaleString('en-SG')}${latest.comment ? ` — “${latest.comment}”` : ''}`).slice(0, 140), M + 120, ay);
+      doc.setTextColor(...MUTE).text(safe(`${latest.reviewerName ?? 'Reviewer'} · ${new Date(latest.createdAt).toLocaleString('en-SG', { timeZone: TZ, dateStyle: 'medium', timeStyle: 'short' })}${latest.comment ? ` — “${latest.comment}”` : ''}`).slice(0, 140), M + 120, ay);
     }
     ay += 7;
   }
@@ -335,7 +344,7 @@ export async function buildPreshootPack(input: PackInput): Promise<PackResult> {
     }
     const footTone: [number, number, number] = i === 1 ? [120, 128, 140] : MUTE;
     doc.setFont('helvetica', 'normal').setFontSize(7).setTextColor(...footTone);
-    doc.text(safe(`Accurova · Confidential · ${isFinal ? 'Approved pack' : 'Draft'} · ${now.toISOString().slice(0, 10)}`), W - M, H - 6, { align: 'right' });
+    doc.text(safe(`Accurova · Confidential · ${isFinal ? 'Approved pack' : 'Draft'} · ${sgDate(now)}`), W - M, H - 6, { align: 'right' });
     doc.text(`${i} / ${pages}`, M, H - 6);
   }
 

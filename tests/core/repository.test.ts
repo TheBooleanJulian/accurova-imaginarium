@@ -277,18 +277,19 @@ describe('end-to-end: brief → concepts → poses → shot plan → client appr
     const owner = make();
     await owner.signIn('julian@accurova.local');
     const p = await owner.createProject({ name: 'P', client: 'C', template: 'campaign' });
-    let b = await owner.loadProject(p.id);
-    const exportNode = byType(b.nodes, 'export');
-    b = await save(owner, b, patchNode(b, exportNode.id, { mode: 'final' }));
+    const b0 = await owner.loadProject(p.id);
+    const exportNode = byType(b0.nodes, 'export');
+    await save(owner, b0, patchNode(b0, exportNode.id, { mode: 'final' }));
     const r = await owner.runNode(p.id, exportNode.id, 'export', { idempotencyKey: 'f' });
     await owner.engine.whenIdle();
     const job = (await owner.loadProject(p.id)).jobs.find((j) => j.id === r.job.id)!;
     expect(job.status).toBe('failed');
     expect(job.error?.message).toMatch(/final pack needs/);
     // A draft is fine.
-    b = await save(owner, await owner.loadProject(p.id), patchNode(await owner.loadProject(p.id), exportNode.id, { mode: 'draft' }));
-    b = await run(owner, b, exportNode.id, 'export');
-    expect(b.assets.some((a) => a.role === 'export')).toBe(true);
+    const latest = await owner.loadProject(p.id);
+    const saved = await save(owner, latest, patchNode(latest, exportNode.id, { mode: 'draft' }));
+    const done = await run(owner, saved, exportNode.id, 'export');
+    expect(done.assets.some((a) => a.role === 'export')).toBe(true);
   });
 
   it('refuses to edit original product photographs', async () => {

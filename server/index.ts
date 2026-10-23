@@ -8,14 +8,15 @@ import { existsSync } from 'node:fs';
 import path from 'node:path';
 import { serve } from '@hono/node-server';
 import { serveStatic } from '@hono/node-server/serve-static';
-import { loadConfig } from './config';
+import { loadConfig, loadDotEnv } from './config';
 import { createRuntime } from './runtime';
 
+loadDotEnv();
 const cfg = loadConfig();
 const rt = await createRuntime(cfg);
 rt.startWorker();
 
-const dist = path.resolve('dist');
+const dist = path.resolve(process.env.STATIC_DIR ?? 'dist');
 if (existsSync(path.join(dist, 'index.html'))) {
   rt.app.use('/assets/*', async (c, next) => {
     await next();

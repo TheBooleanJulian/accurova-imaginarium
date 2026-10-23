@@ -32,12 +32,40 @@ export async function createRepository(): Promise<Repository> {
     import('@/features/export/rasterize.browser'),
   ]);
   const SESSION_KEY = 'imaginarium.session';
+  const { MemoryTableStore } = await import('./local/tableStore');
+  // Private windows and some embedded previews block IndexedDB: fall back to memory (lost on reload).
+  const store = await (async () => {
+    try {
+      const s = new IndexedDbTableStore();
+      await s.read(['projects']);
+      return s;
+    } catch {
+      return new MemoryTableStore();
+    }
+  })();
   return new LocalRepository({
-    store: new IndexedDbTableStore(),
-    session: {
-      get: () => localStorage.getItem(SESSION_KEY),
-      set: (v) => (v ? localStorage.setItem(SESSION_KEY, v) : localStorage.removeItem(SESSION_KEY)),
-    },
+    store,
+    session: (() => {
+      let mem: string | null = null;
+      return {
+        get: () => {
+          try {
+            return localStorage.getItem(SESSION_KEY);
+          } catch {
+            return mem;
+          }
+        },
+        set: (v: string | null) => {
+          mem = v;
+          try {
+            if (v) localStorage.setItem(SESSION_KEY, v);
+            else localStorage.removeItem(SESSION_KEY);
+          } catch {
+            /* storage blocked: keep the session in memory */
+          }
+        },
+      };
+    })(),
     channel: typeof BroadcastChannel !== 'undefined' ? new BroadcastChannel('accurova-imaginarium') : null,
     probeImage,
     rasterize: browserRasterizer,

@@ -41,6 +41,12 @@ export function ProjectsPage() {
       </header>
 
       <main className="mx-auto max-w-6xl px-4 py-8 sm:px-6">
+        {import.meta.env.VITE_DEMO && (
+          <div className="mb-6 rounded-xl border border-gold/30 bg-gold-dim px-4 py-3 text-[13px] leading-relaxed text-soft">
+            <span className="font-medium text-gold">Preview demo.</span> Everything stays in this browser and the AI is a mock that draws labelled
+            placeholders. File downloads (PDF packs) are blocked in this preview. Run the app or deploy it for real AI, client logins and PDF downloads.
+          </div>
+        )}
         <div className="flex flex-wrap items-end gap-4">
           <div>
             <div className="label-mono">Preshoot studio</div>

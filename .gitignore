@@ -12,3 +12,5 @@ api/index.mjs
 .data
 test-results
 playwright-report
+.e2e
+.demo

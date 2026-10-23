@@ -180,12 +180,13 @@ export class OpenAIProvider implements AIProvider {
       signal.removeEventListener('abort', onAbort);
     }
     const text = await res.text();
-    let body: unknown = null;
-    try {
-      body = text ? JSON.parse(text) : null;
-    } catch {
-      body = null;
-    }
+    const body: unknown = (() => {
+      try {
+        return text ? JSON.parse(text) : null;
+      } catch {
+        return null;
+      }
+    })();
     if (!res.ok) {
       const err = (body as { error?: { message?: string; code?: string; type?: string } } | null)?.error;
       const msg = err?.message ?? (text.slice(0, 300) || res.statusText);
