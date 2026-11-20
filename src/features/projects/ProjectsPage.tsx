@@ -9,7 +9,7 @@ import { cn, errMsg, timeAgo } from '@/lib/cn';
 import { ROLE_LABELS } from '@/core/permissions';
 import type { ProjectStatus } from '@/core/types';
 
-const STATUS_TONE: Record<ProjectStatus, 'mute' | 'teal' | 'ok' | 'gold'> = { draft: 'mute', in_review: 'gold', approved: 'ok', archived: 'mute' };
+const STATUS_TONE: Record<ProjectStatus, 'mute' | 'cyan' | 'ok' | 'magenta'> = { draft: 'mute', in_review: 'magenta', approved: 'ok', archived: 'mute' };
 
 export function ProjectsPage() {
   const { repo, user } = useRepo();
@@ -34,7 +34,7 @@ export function ProjectsPage() {
         <div className="mx-auto flex h-14 max-w-6xl items-center gap-4 px-4 sm:px-6">
           <Wordmark />
           <div className="ml-auto flex items-center gap-2">
-            <Badge tone={repo.mode === 'local' ? 'gold' : 'teal'}>{repo.providerLabel}</Badge>
+            <Badge tone={repo.mode === 'local' ? 'warn' : 'cyan'}>{repo.providerLabel}</Badge>
             <UserMenu />
           </div>
         </div>
@@ -42,8 +42,8 @@ export function ProjectsPage() {
 
       <main className="mx-auto max-w-6xl px-4 py-8 sm:px-6">
         {import.meta.env.VITE_DEMO && (
-          <div className="mb-6 rounded-xl border border-gold/30 bg-gold-dim px-4 py-3 text-[13px] leading-relaxed text-soft">
-            <span className="font-medium text-gold">Preview demo.</span> Everything stays in this browser and the AI is a mock that draws labelled
+          <div className="mb-6 rounded-xl border border-magenta/30 bg-magenta-dim px-4 py-3 text-[13px] leading-relaxed text-soft">
+            <span className="font-medium text-magenta">Preview demo.</span> Everything stays in this browser and the AI is a mock that draws labelled
             placeholders. File downloads (PDF packs) are blocked in this preview. Run the app or deploy it for real AI, client logins and PDF downloads.
           </div>
         )}
@@ -79,19 +79,19 @@ export function ProjectsPage() {
                 <button
                   key={s.project.id}
                   onClick={() => open(s)}
-                  className="group overflow-hidden rounded-2xl border border-line bg-panel text-left transition hover:-translate-y-0.5 hover:border-teal/40"
+                  className="group overflow-hidden rounded-2xl border border-line bg-panel text-left transition hover:-translate-y-0.5 hover:border-cyan/40"
                 >
                   <div className="relative aspect-[16/10] overflow-hidden bg-ink">
                     {s.coverAsset ? (
                       <AssetImage asset={s.coverAsset} className="h-full w-full transition duration-500 group-hover:scale-[1.03]" thumb />
                     ) : (
-                      <div className="flex h-full items-center justify-center bg-[radial-gradient(circle_at_30%_20%,#00d4c822,transparent_60%)]">
+                      <div className="flex h-full items-center justify-center bg-[radial-gradient(circle_at_30%_20%,var(--cyan-tint),transparent_60%)]">
                         <LayoutTemplate className="size-8 text-line-2" />
                       </div>
                     )}
                     <div className="absolute left-3 top-3 flex gap-1.5">
                       <Badge tone={STATUS_TONE[s.project.status]}>{s.project.status.replace('_', ' ')}</Badge>
-                      {s.pendingReviews > 0 && <Badge tone="gold">{s.pendingReviews} awaiting review</Badge>}
+                      {s.pendingReviews > 0 && <Badge tone="warn">{s.pendingReviews} awaiting review</Badge>}
                     </div>
                   </div>
                   <div className="space-y-1 p-4">
@@ -167,9 +167,9 @@ function NewProjectDialog({ open, onClose }: { open: boolean; onClose: () => voi
                 type="button"
                 key={id}
                 onClick={() => setTemplate(id)}
-                className={cn('rounded-xl border p-3 text-left transition', template === id ? 'border-teal/60 bg-teal-dim' : 'border-line hover:border-line-2')}
+                className={cn('rounded-xl border p-3 text-left transition', template === id ? 'border-cyan/60 bg-cyan-dim' : 'border-line hover:border-line-2')}
               >
-                <Icon className={cn('mb-2 size-4', template === id ? 'text-teal' : 'text-mute')} />
+                <Icon className={cn('mb-2 size-4', template === id ? 'text-cyan' : 'text-mute')} />
                 <div className="text-sm font-medium">{title}</div>
                 <div className="mt-0.5 text-xs text-soft">{desc}</div>
               </button>

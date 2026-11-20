@@ -57,7 +57,8 @@ export interface LocalRepoOptions {
   autoProvisionOwner?: boolean;
 }
 
-export const DEFAULT_OWNER: Pick<Profile, 'email' | 'displayName'> = { email: 'julian@accurova.local', displayName: 'Julian · Accurova' };
+export const DEFAULT_OWNER: Pick<Profile, 'email' | 'displayName'> = { email: 'demo@imaginarium.local', displayName: 'DEMO ACCOUNT' };
+const LEGACY_OWNER_EMAIL = 'julian@accurova.local';
 
 const memorySession = (): SessionStore => {
   let v: string | null = null;
@@ -151,11 +152,22 @@ export class LocalRepository implements Repository {
     const found = id ? profiles.find((p) => p.id === id) : undefined;
     if (found) return found;
     if (this.autoProvision && !id) {
-      const owner = profiles.find((p) => p.email === DEFAULT_OWNER.email) ?? (await this.ensureProfile(DEFAULT_OWNER.email, DEFAULT_OWNER.displayName));
+      const owner = profiles.find((p) => p.email === DEFAULT_OWNER.email) ?? (await this.adoptLegacyOwner()) ?? (await this.ensureProfile(DEFAULT_OWNER.email, DEFAULT_OWNER.displayName));
       this.session.set(owner.id);
       return owner;
     }
     return null;
+  }
+
+  /** Browsers that ran an earlier build keep their projects: rename the old default owner to the demo account. */
+  private async adoptLegacyOwner(): Promise<Profile | null> {
+    return this.store.mutate(['profiles'], (t) => {
+      const old = t.profiles.find((p) => p.email === LEGACY_OWNER_EMAIL);
+      if (!old) return null;
+      old.email = DEFAULT_OWNER.email;
+      old.displayName = DEFAULT_OWNER.displayName;
+      return old;
+    });
   }
 
   private async ensureProfile(email: string, displayName?: string): Promise<Profile> {

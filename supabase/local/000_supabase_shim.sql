@@ -4,11 +4,13 @@
 
 create schema if not exists auth;
 
+-- Roles are cluster-wide and parallel test files each run this shim, so a plain
+-- "if not exists" check can race. Swallow the duplicate-role error instead.
 do $$
 begin
-  if not exists (select 1 from pg_roles where rolname = 'anon') then create role anon nologin noinherit; end if;
-  if not exists (select 1 from pg_roles where rolname = 'authenticated') then create role authenticated nologin noinherit; end if;
-  if not exists (select 1 from pg_roles where rolname = 'service_role') then create role service_role nologin noinherit bypassrls; end if;
+  begin create role anon nologin noinherit; exception when duplicate_object or unique_violation then null; end;
+  begin create role authenticated nologin noinherit; exception when duplicate_object or unique_violation then null; end;
+  begin create role service_role nologin noinherit bypassrls; exception when duplicate_object or unique_violation then null; end;
 end $$;
 
 create table if not exists auth.users (

@@ -11,7 +11,7 @@ import { cn, errMsg, timeAgo } from '@/lib/cn';
 export function ApprovalPill({ state }: { state: ApprovalState }) {
   if (state === 'approved') return <Badge tone="ok"><CheckCircle2 className="size-3" /> Approved</Badge>;
   if (state === 'changes_requested') return <Badge tone="err"><RotateCcw className="size-3" /> Changes</Badge>;
-  return <Badge tone="gold">Pending</Badge>;
+  return <Badge tone="warn">Pending</Badge>;
 }
 
 export function AssetCard({
@@ -34,7 +34,7 @@ export function AssetCard({
   const state = approvalStateOf(bundle.approvals, asset.id);
   const comments = bundle.comments.filter((c) => c.assetId === asset.id && !c.resolved).length;
   return (
-    <div className={cn('group overflow-hidden rounded-lg border bg-ink', selected ? 'border-teal ring-1 ring-teal/40' : 'border-line')}>
+    <div className={cn('group overflow-hidden rounded-lg border bg-ink', selected ? 'border-cyan ring-1 ring-cyan/40' : 'border-line')}>
       <button type="button" onClick={onClick} className="relative block aspect-square w-full overflow-hidden">
         <AssetImage asset={asset} className="h-full w-full transition group-hover:scale-[1.02]" thumb />
         <div className="absolute left-1.5 top-1.5"><ProvenanceBadge asset={asset} /></div>
@@ -49,7 +49,7 @@ export function AssetCard({
         <div className="flex items-center gap-1">
           {showApproval && asset.sourceType !== 'upload' && <ApprovalPill state={state} />}
           {onToggle && (
-            <button type="button" onClick={onToggle} className={cn('ml-auto rounded-md border px-1.5 py-0.5 font-mono text-[10px] uppercase', selected ? 'border-teal/60 text-teal' : 'border-line text-mute hover:text-soft')}>
+            <button type="button" onClick={onToggle} className={cn('ml-auto rounded-md border px-1.5 py-0.5 font-mono text-[10px] uppercase', selected ? 'border-cyan/60 text-cyan' : 'border-line text-mute hover:text-soft')}>
               {selected ? 'Selected' : 'Select'}
             </button>
           )}
@@ -104,7 +104,7 @@ export function AssetLightbox({ asset, bundle, onClose }: { asset: Asset | null;
             <div className="flex flex-wrap items-center gap-1.5 text-[11px] text-soft">
               <span className="label-mono">Versions</span>
               {versions.map((v) => (
-                <span key={v.id} className={cn('rounded border px-1.5 py-0.5 font-mono', v.id === asset.id ? 'border-teal/60 text-teal' : 'border-line')}>
+                <span key={v.id} className={cn('rounded border px-1.5 py-0.5 font-mono', v.id === asset.id ? 'border-cyan/60 text-cyan' : 'border-line')}>
                   v{v.version} · {approvalStateOf(bundle.approvals, v.id).replace('_', ' ')}
                 </span>
               ))}
@@ -154,7 +154,7 @@ export function AssetLightbox({ asset, bundle, onClose }: { asset: Asset | null;
                   <span className="text-soft">{c.authorName}</span> · {timeAgo(c.createdAt)}
                   {c.resolved && <Badge>resolved</Badge>}
                   {can(bundle.myRole, 'comment.resolve') && (
-                    <button className="ml-auto hover:text-teal" onClick={() => repo.resolveComment(c.id, !c.resolved).catch((e) => toast(errMsg(e), 'err'))}>
+                    <button className="ml-auto hover:text-cyan" onClick={() => repo.resolveComment(c.id, !c.resolved).catch((e) => toast(errMsg(e), 'err'))}>
                       {c.resolved ? 'Reopen' : 'Resolve'}
                     </button>
                   )}
@@ -191,7 +191,7 @@ export function AssetLightbox({ asset, bundle, onClose }: { asset: Asset | null;
               </details>
             )}
             {url && (
-              <a href={url} download={asset.originalFilename ?? `${asset.id}`} className="mt-1 inline-flex items-center gap-1 text-teal hover:underline">
+              <a href={url} download={asset.originalFilename ?? `${asset.id}`} className="mt-1 inline-flex items-center gap-1 text-cyan hover:underline">
                 <Download className="size-3" /> Download
               </a>
             )}

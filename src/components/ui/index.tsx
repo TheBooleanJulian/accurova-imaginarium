@@ -14,13 +14,13 @@ import { cn } from '@/lib/cn';
 import type { Asset } from '@/core/types';
 import { useRepo } from '@/lib/repoContext';
 
-type Variant = 'primary' | 'gold' | 'ghost' | 'outline' | 'danger' | 'subtle';
+type Variant = 'primary' | 'magenta' | 'ghost' | 'outline' | 'danger' | 'subtle';
 
 const variants: Record<Variant, string> = {
-  primary: 'bg-teal text-void hover:bg-[#2be3d8] font-semibold',
-  gold: 'bg-gold text-void hover:bg-[#ffd75e] font-semibold',
+  primary: 'bg-cyan-fill text-on-accent hover:brightness-110 font-semibold',
+  magenta: 'bg-magenta-fill text-on-accent hover:brightness-110 font-semibold',
   ghost: 'text-soft hover:text-text hover:bg-raised',
-  outline: 'border border-line-2 text-text hover:border-teal/60 hover:bg-raised',
+  outline: 'border border-line-2 text-text hover:border-cyan/60 hover:bg-raised',
   danger: 'border border-err/40 text-err hover:bg-err/10',
   subtle: 'bg-raised text-text hover:bg-line border border-line',
 };
@@ -41,7 +41,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button
       disabled={disabled || loading}
       className={cn(
         'inline-flex items-center justify-center gap-1.5 rounded-lg transition-colors disabled:opacity-40 disabled:pointer-events-none select-none',
-        'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal/60',
+        'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan/60',
         size === 'sm' && 'h-7 px-2.5 text-xs',
         size === 'md' && 'h-9 px-3.5 text-sm',
         size === 'icon' && 'h-8 w-8',
@@ -57,7 +57,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button
 });
 
 const field =
-  'w-full rounded-lg border border-line bg-ink px-3 text-sm text-text placeholder:text-mute focus:outline-none focus:border-teal/70 focus:ring-2 focus:ring-teal/20 disabled:opacity-60';
+  'w-full rounded-lg border border-line bg-ink px-3 text-sm text-text placeholder:text-mute focus:outline-none focus:border-cyan/70 focus:ring-2 focus:ring-cyan/20 disabled:opacity-60';
 
 export const Input = forwardRef<HTMLInputElement, InputHTMLAttributes<HTMLInputElement>>(function Input({ className, ...p }, ref) {
   return <input ref={ref} className={cn(field, 'h-9', className)} {...p} />;
@@ -85,11 +85,11 @@ export function Field({ label, hint, children, className }: { label: string; hin
   );
 }
 
-export function Badge({ tone = 'mute', children, className }: { tone?: 'mute' | 'teal' | 'gold' | 'ok' | 'warn' | 'err'; children: ReactNode; className?: string }) {
+export function Badge({ tone = 'mute', children, className }: { tone?: 'mute' | 'cyan' | 'magenta' | 'ok' | 'warn' | 'err'; children: ReactNode; className?: string }) {
   const tones = {
     mute: 'bg-raised text-soft border-line',
-    teal: 'bg-teal-dim text-teal border-teal/25',
-    gold: 'bg-gold-dim text-gold border-gold/25',
+    cyan: 'bg-cyan-dim text-cyan border-cyan/25',
+    magenta: 'bg-magenta-dim text-magenta border-magenta/25',
     ok: 'bg-ok/10 text-ok border-ok/25',
     warn: 'bg-warn/10 text-warn border-warn/25',
     err: 'bg-err/10 text-err border-err/25',
@@ -109,7 +109,7 @@ export function Chip({ active, onClick, children, disabled }: { active: boolean;
       onClick={onClick}
       className={cn(
         'rounded-full border px-2.5 py-1 text-xs transition-colors disabled:opacity-50',
-        active ? 'border-teal/60 bg-teal-dim text-teal' : 'border-line text-soft hover:border-line-2 hover:text-text',
+        active ? 'border-cyan/60 bg-cyan-dim text-cyan' : 'border-line text-soft hover:border-line-2 hover:text-text',
       )}
     >
       {children}
@@ -177,8 +177,8 @@ export function Toaster() {
           role="status"
           className={cn(
             'pointer-events-auto max-w-[90vw] rounded-lg border px-3.5 py-2 text-[13px] shadow-xl backdrop-blur',
-            t.tone === 'err' && 'border-err/40 bg-[#2a1214]/95 text-[#ffd0d0]',
-            t.tone === 'ok' && 'border-teal/40 bg-[#082420]/95 text-[#c9fffb]',
+            t.tone === 'err' && 'border-err/50 bg-panel text-text',
+            t.tone === 'ok' && 'border-cyan/50 bg-panel text-text',
             t.tone === 'info' && 'border-line-2 bg-raised/95 text-text',
           )}
         >
@@ -218,15 +218,15 @@ export function AssetImage({ asset, className, alt, thumb }: { asset: Asset | un
 /** Fidelity label: makes it impossible to confuse an AI concept with a real photo. */
 export function ProvenanceBadge({ asset }: { asset: Asset }) {
   if (asset.sourceType === 'upload') {
-    return <Badge tone={asset.role === 'product' ? 'gold' : 'mute'}>{asset.role === 'product' ? 'Real product' : asset.role === 'brand' ? 'Brand asset' : 'Reference'}</Badge>;
+    return <Badge tone={asset.role === 'product' ? 'magenta' : 'mute'}>{asset.role === 'product' ? 'Real product' : asset.role === 'brand' ? 'Brand asset' : 'Reference'}</Badge>;
   }
-  if (asset.role === 'pose') return <Badge tone="teal">AI pose ref</Badge>;
-  if (asset.role === 'edit') return <Badge tone="teal">AI edit v{asset.version}</Badge>;
-  return <Badge tone="teal">AI concept</Badge>;
+  if (asset.role === 'pose') return <Badge tone="cyan">AI pose ref</Badge>;
+  if (asset.role === 'edit') return <Badge tone="cyan">AI edit v{asset.version}</Badge>;
+  return <Badge tone="cyan">AI concept</Badge>;
 }
 
 export function Spinner({ className }: { className?: string }) {
-  return <Loader2 className={cn('size-4 animate-spin text-teal', className)} />;
+  return <Loader2 className={cn('size-4 animate-spin text-cyan', className)} />;
 }
 
 export function Empty({ icon, title, children }: { icon?: ReactNode; title: string; children?: ReactNode }) {
@@ -243,14 +243,14 @@ export function Wordmark({ compact }: { compact?: boolean }) {
   return (
     <div className="flex items-center gap-2.5 select-none">
       <svg viewBox="0 0 64 64" className="size-7 shrink-0" aria-hidden>
-        <rect width="64" height="64" rx="14" fill="#0E131B" stroke="#1D2632" />
-        <circle cx="32" cy="32" r="16" fill="none" stroke="#00D4C8" strokeWidth="4" />
-        <circle cx="32" cy="32" r="6" fill="#F5C842" />
+        <rect width="64" height="64" rx="14" style={{ fill: "var(--surface)", stroke: "var(--line)" }} />
+        <circle cx="32" cy="32" r="16" fill="none" strokeWidth="4" style={{ stroke: "var(--cyan)" }} />
+        <circle cx="32" cy="32" r="6" style={{ fill: "var(--magenta)" }} />
       </svg>
       {!compact && (
         <div className="leading-none">
           <div className="text-[13px] font-semibold tracking-[0.18em]">ACCUROVA</div>
-          <div className="mt-0.5 font-mono text-[9.5px] tracking-[0.22em] text-teal">IMAGINARIUM</div>
+          <div className="mt-0.5 font-mono text-[9.5px] tracking-[0.22em] text-cyan">IMAGINARIUM</div>
         </div>
       )}
     </div>

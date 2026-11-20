@@ -41,7 +41,7 @@ export function ApprovalInspector({ node, update }: InspectorProps) {
       <Section title={`Review status · ${list.length}`}>
         <div className="flex flex-wrap gap-1.5">
           <Badge tone="ok">{b.assetIds.length} approved</Badge>
-          <Badge tone="gold">{b.pendingAssetIds.length} pending</Badge>
+          <Badge tone="warn">{b.pendingAssetIds.length} pending</Badge>
           <Badge tone="err">{b.changesRequestedAssetIds.length} changes requested</Badge>
         </div>
         <div className="space-y-1 text-[11px] text-mute">
@@ -99,7 +99,7 @@ export function NodeComments({ nodeId }: { nodeId: string }) {
           <div className="flex items-center gap-2 text-[11px] text-mute">
             <span className="text-soft">{c.authorName}</span> · {timeAgo(c.createdAt)}
             {can(bundle.myRole, 'comment.resolve') && (
-              <button className="ml-auto hover:text-teal" onClick={() => repo.resolveComment(c.id, !c.resolved).catch((e) => toast(errMsg(e), 'err'))}>
+              <button className="ml-auto hover:text-cyan" onClick={() => repo.resolveComment(c.id, !c.resolved).catch((e) => toast(errMsg(e), 'err'))}>
                 {c.resolved ? 'Reopen' : 'Resolve'}
               </button>
             )}

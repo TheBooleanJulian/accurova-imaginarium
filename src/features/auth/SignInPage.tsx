@@ -56,7 +56,7 @@ export function SignInPage({ presetEmail, onDone, title }: { presetEmail?: strin
           <h1 className="text-2xl font-semibold tracking-tight">{title ?? 'Sign in'}</h1>
           <p className="mt-1 text-sm text-soft">
             {local ? (
-              <>Local mode: accounts live in this browser, so you can test the client experience by signing in as the invited email. <Badge>no password</Badge></>
+              <>Demo mode: accounts live in this browser, so you can test the client experience by signing in as the invited email. <Badge>no password</Badge></>
             ) : passwordless ? (
               <>Development sign-in: email only. <Badge>dev server</Badge></>
             ) : (
@@ -82,7 +82,7 @@ export function SignInPage({ presetEmail, onDone, title }: { presetEmail?: strin
             {mode === 'up' ? 'Create account' : 'Continue'} <ArrowRight className="size-4" />
           </Button>
           {!passwordless && repo.signUp && (
-            <button type="button" className="w-full text-center text-xs text-soft hover:text-teal" onClick={() => setMode(mode === 'in' ? 'up' : 'in')}>
+            <button type="button" className="w-full text-center text-xs text-soft hover:text-cyan" onClick={() => setMode(mode === 'in' ? 'up' : 'in')}>
               {mode === 'in' ? 'New here? Create an account' : 'Already have an account? Sign in'}
             </button>
           )}
@@ -97,7 +97,7 @@ export function SignInPage({ presetEmail, onDone, title }: { presetEmail?: strin
                   await repo.signIn(p.email);
                   await done();
                 }}
-                className="flex w-full items-center gap-3 rounded-lg border border-line bg-panel px-3 py-2.5 text-left hover:border-teal/50"
+                className="flex w-full items-center gap-3 rounded-lg border border-line bg-panel px-3 py-2.5 text-left hover:border-cyan/50"
               >
                 <UserRound className="size-4 text-mute" />
                 <div className="min-w-0">

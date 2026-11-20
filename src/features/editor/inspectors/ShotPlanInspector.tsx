@@ -7,7 +7,7 @@ import { cn } from '@/lib/cn';
 import { useEditor } from '../editorContext';
 import { ListInput, OpControls, RunHistory, Section, type InspectorProps } from './shared';
 
-const PRIORITY_TONE = { must: 'gold', should: 'teal', nice: 'mute' } as const;
+const PRIORITY_TONE = { must: 'magenta', should: 'cyan', nice: 'mute' } as const;
 
 const TEXT_FIELDS: [keyof Shot, string][] = [
   ['poseDirection', 'Pose & model direction'],
@@ -62,7 +62,7 @@ export function ShotPlanInspector({ node, update }: InspectorProps) {
       {plan && (
         <Section
           title={`Shot list · ${plan.shots.length}`}
-          right={edited ? <Badge tone="gold">edited</Badge> : <Badge tone="teal">generated</Badge>}
+          right={edited ? <Badge tone="warn">edited</Badge> : <Badge tone="cyan">generated</Badge>}
         >
           {outdatedEdits && (
             <div className="rounded-lg border border-warn/30 bg-warn/10 p-2.5 text-[12px] text-warn">
@@ -81,7 +81,7 @@ export function ShotPlanInspector({ node, update }: InspectorProps) {
                 <div key={s.id} className={cn('rounded-lg border', open ? 'border-line-2 bg-ink' : 'border-line')}>
                   <button type="button" className="flex w-full items-center gap-2 px-2.5 py-2 text-left" onClick={() => setOpenShot(open ? null : s.id)}>
                     <ChevronRight className={cn('size-3.5 shrink-0 text-mute transition', open && 'rotate-90')} />
-                    <span className="font-mono text-[11px] text-teal">{s.id}</span>
+                    <span className="font-mono text-[11px] text-cyan">{s.id}</span>
                     <span className="min-w-0 flex-1 truncate text-[12.5px]">{s.title}</span>
                     <Badge tone={PRIORITY_TONE[s.priority]}>{s.priority}</Badge>
                     <span className="font-mono text-[10px] text-mute">{s.setupMinutes}m</span>
@@ -145,7 +145,7 @@ export function ShotPlanInspector({ node, update }: InspectorProps) {
           <div className="flex items-center justify-between font-mono text-[11px] text-mute">
             <span>Total setup ≈ {Math.round(plan.totalSetupMinutes / 6) / 10} h</span>
             {edited && canEdit && (
-              <button className="inline-flex items-center gap-1 hover:text-teal" onClick={() => update({ editedPlan: null, editedFromRunId: null })}>
+              <button className="inline-flex items-center gap-1 hover:text-cyan" onClick={() => update({ editedPlan: null, editedFromRunId: null })}>
                 <RotateCcw className="size-3" /> Discard edits
               </button>
             )}

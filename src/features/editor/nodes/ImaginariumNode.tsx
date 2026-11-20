@@ -10,13 +10,13 @@ import { cn } from '@/lib/cn';
 import { useEditor, type NodeStatus } from '../editorContext';
 
 export const PORT_COLORS: Record<PortType, string> = {
-  brief: '#F5C842',
-  images: '#00D4C8',
-  analysis: '#B794F6',
-  text: '#9AA4B2',
-  direction: '#F5A742',
-  shotplan: '#7CE38B',
-  approved: '#5AC8FA',
+  brief: 'var(--magenta-ink)',
+  images: 'var(--cyan-ink)',
+  analysis: 'var(--ink-muted)',
+  text: 'var(--ink-faint)',
+  direction: 'var(--warning)',
+  shotplan: 'var(--success)',
+  approved: 'var(--success)',
 };
 
 export type FlowNodeData = { node: GraphNode; status: NodeStatus };
@@ -25,8 +25,8 @@ export type FlowNode = Node<FlowNodeData, 'imaginarium'>;
 const STATE_UI: Record<NodeStatus['state'], { label: string; cls: string; icon?: ReactNode } | null> = {
   idle: null,
   never_run: { label: 'not run', cls: 'text-mute border-line' },
-  queued: { label: 'queued', cls: 'text-gold border-gold/40', icon: <Clock className="size-3" /> },
-  running: { label: 'running', cls: 'text-teal border-teal/50', icon: <Loader2 className="size-3 animate-spin" /> },
+  queued: { label: 'queued', cls: 'text-magenta border-magenta/40', icon: <Clock className="size-3" /> },
+  running: { label: 'running', cls: 'text-cyan border-cyan/50', icon: <Loader2 className="size-3 animate-spin" /> },
   failed: { label: 'failed', cls: 'text-err border-err/40', icon: <AlertTriangle className="size-3" /> },
   stale: { label: 'stale', cls: 'text-warn border-warn/40', icon: <RefreshCw className="size-3" /> },
   fresh: { label: 'up to date', cls: 'text-ok border-ok/30', icon: <CheckCircle2 className="size-3" /> },
@@ -112,7 +112,7 @@ function Preview({ node }: { node: GraphNode }) {
           {out ? (
             <div className="space-y-1">
               {out.directions.map((dir, i) => (
-                <div key={i} className={cn('flex items-center gap-1.5 rounded-md border px-2 py-1 text-xs', d.selectedDirection === i ? 'border-teal/60 bg-teal-dim text-text' : 'border-line text-soft')}>
+                <div key={i} className={cn('flex items-center gap-1.5 rounded-md border px-2 py-1 text-xs', d.selectedDirection === i ? 'border-cyan/60 bg-cyan-dim text-text' : 'border-line text-soft')}>
                   <span className="flex gap-0.5">{dir.palette.slice(0, 3).map((c) => <span key={c} className="size-2 rounded-full" style={{ background: c }} />)}</span>
                   <span className="truncate">{dir.title}</span>
                 </div>
@@ -141,7 +141,7 @@ function Preview({ node }: { node: GraphNode }) {
         <div className="space-y-1 text-xs">
           {plan.shots.slice(0, 4).map((s) => (
             <div key={s.id} className="flex gap-2 truncate">
-              <span className="font-mono text-teal">{s.id}</span>
+              <span className="font-mono text-cyan">{s.id}</span>
               <span className="truncate text-soft">{s.title}</span>
             </div>
           ))}
@@ -158,7 +158,7 @@ function Preview({ node }: { node: GraphNode }) {
       return (
         <div className="flex flex-wrap gap-1.5 font-mono text-[10.5px]">
           <span className="rounded border border-ok/30 px-1.5 py-0.5 text-ok">{b?.assetIds.length ?? 0} approved</span>
-          <span className="rounded border border-gold/30 px-1.5 py-0.5 text-gold">{b?.pendingAssetIds.length ?? 0} pending</span>
+          <span className="rounded border border-magenta/30 px-1.5 py-0.5 text-magenta">{b?.pendingAssetIds.length ?? 0} pending</span>
           <span className="rounded border border-err/30 px-1.5 py-0.5 text-err">{b?.changesRequestedAssetIds.length ?? 0} changes</span>
         </div>
       );
@@ -180,9 +180,9 @@ export const ImaginariumNode = memo(function ImaginariumNode({ data, selected }:
   return (
     <div
       className={cn(
-        'group/node relative flex flex-col rounded-xl border bg-panel/95 shadow-[0_8px_30px_-12px_#000] backdrop-blur',
+        'group/node relative flex flex-col rounded-xl border bg-panel/95 shadow-[0_8px_30px_-12px_var(--scrim)] backdrop-blur',
         node.size ? 'h-full w-full min-w-[260px]' : 'w-[280px]',
-        selected ? 'border-teal/70 ring-1 ring-teal/30' : 'border-line hover:border-line-2',
+        selected ? 'border-cyan/70 ring-1 ring-cyan/30' : 'border-line hover:border-line-2',
         status.state === 'running' && 'running-glow',
       )}
     >
@@ -202,7 +202,7 @@ export const ImaginariumNode = memo(function ImaginariumNode({ data, selected }:
         {op && canEdit && (
           <button
             title={`Run: ${def.operations.find((o) => o.id === op)?.label}`}
-            className="nodrag flex size-6 items-center justify-center rounded-md bg-teal/10 text-teal opacity-80 hover:bg-teal hover:text-void group-hover/node:opacity-100"
+            className="nodrag flex size-6 items-center justify-center rounded-md bg-cyan/10 text-cyan opacity-80 hover:bg-cyan hover:text-void group-hover/node:opacity-100"
             onClick={(e) => {
               e.stopPropagation();
               void runOp(node.id, op, { force: status.ops[op]?.freshness === 'fresh' });
@@ -220,7 +220,7 @@ export const ImaginariumNode = memo(function ImaginariumNode({ data, selected }:
             <div key={p.id} className="relative flex h-6 items-center pl-3 pr-2 text-[11px] text-soft">
               <Handle type="target" position={Position.Left} id={p.id} style={{ background: PORT_COLORS[p.type] }} isConnectable={canEdit} />
               {p.label}
-              {p.required && <span className="ml-0.5 text-gold">*</span>}
+              {p.required && <span className="ml-0.5 text-magenta">*</span>}
             </div>
           ))}
         </div>
