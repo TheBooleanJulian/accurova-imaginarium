@@ -58,7 +58,7 @@ export function InvitePage({ token }: { token: string }) {
           <div className="text-sm text-soft">{preview.client}</div>
         </div>
         <div className="flex items-center gap-2 text-sm">
-          Role <Badge tone="teal">{ROLE_LABELS[preview.role]}</Badge>
+          Role <Badge tone="cyan">{ROLE_LABELS[preview.role]}</Badge>
         </div>
         {preview.status !== 'pending' ? (
           <div className="rounded-lg border border-warn/30 bg-warn/10 p-3 text-sm text-warn">This invitation has been {preview.status}.</div>

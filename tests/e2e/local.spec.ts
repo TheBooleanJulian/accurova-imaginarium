@@ -15,7 +15,7 @@ test('browser-only demo: brief → concepts → client approval → final PDF', 
 
   // Back to the owner via the account switcher.
   await page.getByRole('button', { name: /client/ }).first().click();
-  await page.getByRole('button', { name: /Julian/ }).click();
+  await page.getByRole('button', { name: /DEMO ACCOUNT/ }).click();
   await page.locator('button', { hasText: 'Field Watch' }).first().click();
   await expect(page.locator('.react-flow__node')).toHaveCount(9);
   await exportFinal(page);

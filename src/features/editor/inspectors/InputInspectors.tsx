@@ -116,9 +116,9 @@ export function ImageAssetInspector({ node, update }: InspectorProps) {
             onDragLeave={() => setHover(false)}
             onDrop={onDrop}
             onClick={() => input.current?.click()}
-            className={cn('flex cursor-pointer flex-col items-center gap-1.5 rounded-xl border border-dashed px-4 py-6 text-center transition', hover ? 'border-teal bg-teal-dim' : 'border-line-2 hover:border-teal/50')}
+            className={cn('flex cursor-pointer flex-col items-center gap-1.5 rounded-xl border border-dashed px-4 py-6 text-center transition', hover ? 'border-cyan bg-cyan-dim' : 'border-line-2 hover:border-cyan/50')}
           >
-            {uploading ? <Spinner /> : <ImagePlus className="size-5 text-teal" />}
+            {uploading ? <Spinner /> : <ImagePlus className="size-5 text-cyan" />}
             <div className="text-sm">{uploading ? `Uploading ${uploading}…` : 'Drop images or click to upload'}</div>
             <div className="text-[11px] text-mute">JPEG, PNG or WebP · up to {UPLOAD_LIMITS.maxBytes / 1024 / 1024} MB each</div>
             <input ref={input} type="file" accept={UPLOAD_LIMITS.mimeTypes.join(',')} multiple hidden onChange={(e) => e.target.files && void upload(e.target.files)} />

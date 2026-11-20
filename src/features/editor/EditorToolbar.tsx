@@ -14,7 +14,7 @@ import type { SaveState } from './useGraphEditor';
 
 const SAVE_UI: Record<SaveState, { label: string; cls: string; icon: ReactNode }> = {
   saved: { label: 'Saved', cls: 'text-mute', icon: <Check className="size-3.5" /> },
-  dirty: { label: 'Unsaved', cls: 'text-soft', icon: <span className="size-1.5 rounded-full bg-gold" /> },
+  dirty: { label: 'Unsaved', cls: 'text-soft', icon: <span className="size-1.5 rounded-full bg-warn" /> },
   saving: { label: 'Saving…', cls: 'text-soft', icon: <Loader2 className="size-3.5 animate-spin" /> },
   conflict: { label: 'Conflict', cls: 'text-warn', icon: <AlertTriangle className="size-3.5" /> },
   error: { label: 'Not saved', cls: 'text-err', icon: <CloudOff className="size-3.5" /> },
@@ -57,7 +57,7 @@ export function EditorToolbar() {
           onBlur={() => void rename()}
           onKeyDown={(e) => e.key === 'Enter' && (e.target as HTMLInputElement).blur()}
           aria-label="Project name"
-          className="w-[min(36vw,320px)] truncate rounded-md bg-transparent px-1.5 py-0.5 text-[14px] font-semibold outline-none hover:bg-raised focus:bg-raised focus:ring-1 focus:ring-teal/40 disabled:hover:bg-transparent"
+          className="w-[min(36vw,320px)] truncate rounded-md bg-transparent px-1.5 py-0.5 text-[14px] font-semibold outline-none hover:bg-raised focus:bg-raised focus:ring-1 focus:ring-cyan/40 disabled:hover:bg-transparent"
         />
         <div className="truncate px-1.5 font-mono text-[10px] uppercase tracking-wider text-mute">
           {bundle.project.client || 'No client'} · {ROLE_LABELS[bundle.myRole]}
@@ -83,7 +83,7 @@ export function EditorToolbar() {
       </div>
 
       <div className="ml-auto flex items-center gap-1.5">
-        <Badge tone={repo.providerLabel.toLowerCase().includes('mock') ? 'gold' : 'teal'} className="hidden md:inline-flex">
+        <Badge tone={repo.providerLabel.toLowerCase().includes('mock') ? 'warn' : 'cyan'} className="hidden md:inline-flex">
           {repo.providerLabel}
         </Badge>
         <Button variant="ghost" size="icon" onClick={() => setSettings(true)} title="Project settings" aria-label="Project settings">

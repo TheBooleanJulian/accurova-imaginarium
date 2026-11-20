@@ -28,7 +28,7 @@ describe('graph persistence', () => {
   it('saves with revision checks and rejects a stale concurrent save', async () => {
     const { make } = makeWorld();
     const alice = make();
-    await alice.signIn('julian@accurova.local');
+    await alice.signIn('demo@imaginarium.local');
     const p = await alice.createProject({ name: 'P', client: 'C', template: 'campaign' });
     const b1 = await alice.loadProject(p.id);
     const b2 = await alice.loadProject(p.id); // a second editor tab with the same base revision
@@ -44,7 +44,7 @@ describe('graph persistence', () => {
   it('rejects invalid graphs (cycles, bad types, foreign nodes)', async () => {
     const { make } = makeWorld();
     const repo = make();
-    await repo.signIn('julian@accurova.local');
+    await repo.signIn('demo@imaginarium.local');
     const p = await repo.createProject({ name: 'P', client: 'C', template: 'campaign' });
     const b = await repo.loadProject(p.id);
     const pose = byType(b.nodes, 'pose_generator');
@@ -61,7 +61,7 @@ describe('uploads', () => {
   it('validates type and size and preserves the original bytes', async () => {
     const { make } = makeWorld();
     const repo = make();
-    await repo.signIn('julian@accurova.local');
+    await repo.signIn('demo@imaginarium.local');
     const p = await repo.createProject({ name: 'P', client: 'C', template: 'blank' });
     await expect(repo.uploadAsset(p.id, new Blob(['x'], { type: 'text/plain' }), { role: 'reference', filename: 'a.txt' })).rejects.toThrow(/JPEG/);
     const big = new Blob([new Uint8Array(21 * 1024 * 1024)], { type: 'image/png' });
@@ -77,7 +77,7 @@ describe('permissions and isolation', () => {
   async function twoClients() {
     const { make } = makeWorld();
     const owner = make();
-    await owner.signIn('julian@accurova.local');
+    await owner.signIn('demo@imaginarium.local');
     const pA = await owner.createProject({ name: 'Client A shoot', client: 'A', template: 'campaign' });
     const pB = await owner.createProject({ name: 'Client B shoot', client: 'B', template: 'campaign' });
     const inv = await owner.createInvitation(pA.id, 'client@a.com', 'reviewer');
@@ -117,7 +117,7 @@ describe('permissions and isolation', () => {
   it('viewers are read-only', async () => {
     const { make } = makeWorld();
     const owner = make();
-    await owner.signIn('julian@accurova.local');
+    await owner.signIn('demo@imaginarium.local');
     const p = await owner.createProject({ name: 'P', client: 'C', template: 'blank' });
     const a = await owner.uploadAsset(p.id, pngBlob(), { role: 'reference', filename: 'r.png' });
     const inv = await owner.createInvitation(p.id, 'viewer@c.com', 'viewer');
@@ -132,7 +132,7 @@ describe('permissions and isolation', () => {
   it('invitations are bound to the invited email and single-use', async () => {
     const { make } = makeWorld();
     const owner = make();
-    await owner.signIn('julian@accurova.local');
+    await owner.signIn('demo@imaginarium.local');
     const p = await owner.createProject({ name: 'P', client: 'C', template: 'blank' });
     const inv = await owner.createInvitation(p.id, 'right@c.com', 'reviewer');
     const wrong = make();
@@ -161,7 +161,7 @@ describe('end-to-end: brief → concepts → poses → shot plan → client appr
   it('runs the whole Accurova workflow through the application API', async () => {
     const { make } = makeWorld();
     const owner = make();
-    await owner.signIn('julian@accurova.local');
+    await owner.signIn('demo@imaginarium.local');
     const p = await owner.createProject({
       name: 'Acme Field Watch — Launch',
       client: 'Acme',
@@ -275,7 +275,7 @@ describe('end-to-end: brief → concepts → poses → shot plan → client appr
   it('refuses a final export when nothing is approved', async () => {
     const { make } = makeWorld();
     const owner = make();
-    await owner.signIn('julian@accurova.local');
+    await owner.signIn('demo@imaginarium.local');
     const p = await owner.createProject({ name: 'P', client: 'C', template: 'campaign' });
     const b0 = await owner.loadProject(p.id);
     const exportNode = byType(b0.nodes, 'export');
@@ -295,7 +295,7 @@ describe('end-to-end: brief → concepts → poses → shot plan → client appr
   it('refuses to edit original product photographs', async () => {
     const { make } = makeWorld();
     const owner = make();
-    await owner.signIn('julian@accurova.local');
+    await owner.signIn('demo@imaginarium.local');
     const p = await owner.createProject({ name: 'P', client: 'C', template: 'blank' });
     const product = await owner.uploadAsset(p.id, pngBlob(), { role: 'product', filename: 'w.png' });
     const b = await owner.loadProject(p.id);

@@ -1,4 +1,4 @@
-import type { AIProvider, AnalyzeRequest, DirectionsRequest, GeneratedImage, ImageRequest, ProviderResult, ShotPlanRequest } from '@/core/ai';
+﻿import type { AIProvider, AnalyzeRequest, DirectionsRequest, GeneratedImage, ImageRequest, ProviderResult, ShotPlanRequest } from '@/core/ai';
 import { ProviderError, throwIfAborted } from '@/core/ai';
 import { aspectToSize, type Direction, type ReferenceAnalysis, type ShotPlan } from '@/core/schemas';
 import { hashString } from '@/core/hash';
@@ -136,9 +136,9 @@ export function drawScene(opts: {
     <radialGradient id="key"><stop offset="0" stop-color="${c3}" stop-opacity="0.55"/><stop offset="1" stop-color="${c3}" stop-opacity="0"/></radialGradient>
   </defs>
   ${base}
-  <rect x="0" y="${h - fs * 4.2}" width="${w}" height="${fs * 4.2}" fill="#050508" opacity="0.72"/>
+  <rect x="0" y="${h - fs * 4.2}" width="${w}" height="${fs * 4.2}" fill="#05060d" opacity="0.72"/>
   <text x="${fs}" y="${h - fs * 2.5}" font-family="Helvetica, Arial, sans-serif" font-size="${fs}" font-weight="700" fill="#F2EFE9">${esc(opts.title).slice(0, 60)}</text>
-  <text x="${fs}" y="${h - fs * 1.1}" font-family="Courier New, monospace" font-size="${Math.round(fs * 0.72)}" fill="#00D4C8">${esc(tag)} · ${esc(opts.subtitle).slice(0, 70)}</text>
+  <text x="${fs}" y="${h - fs * 1.1}" font-family="Courier New, monospace" font-size="${Math.round(fs * 0.72)}" fill="#00e5ff">${esc(tag)} · ${esc(opts.subtitle).slice(0, 70)}</text>
 </svg>`;
 }
 

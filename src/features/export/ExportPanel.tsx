@@ -68,7 +68,7 @@ export function ExportPanel({ node }: { node: GraphNode }) {
       <label className="flex items-center gap-2 text-[13px] text-soft">
         <input
           type="checkbox"
-          className="accent-teal"
+          className="accent-cyan"
           checked={d.includeReferences !== false}
           disabled={!canEdit}
           onChange={(e) => update({ includeReferences: e.target.checked })}
@@ -79,8 +79,8 @@ export function ExportPanel({ node }: { node: GraphNode }) {
       <div className="grid grid-cols-3 gap-2 text-center">
         {[
           ['Approved', approved?.assetIds.length ?? 0, 'text-ok'],
-          ['Pending', (approved?.pendingAssetIds.length ?? 0) + (approved?.changesRequestedAssetIds.length ?? 0), 'text-gold'],
-          ['Shots', plan?.shots.length ?? 0, 'text-teal'],
+          ['Pending', (approved?.pendingAssetIds.length ?? 0) + (approved?.changesRequestedAssetIds.length ?? 0), 'text-magenta'],
+          ['Shots', plan?.shots.length ?? 0, 'text-cyan'],
         ].map(([k, v, c]) => (
           <div key={k as string} className="rounded-lg border border-line bg-ink py-2">
             <div className={cn('text-lg font-semibold', c as string)}>{v as number}</div>
@@ -111,7 +111,7 @@ export function ExportPanel({ node }: { node: GraphNode }) {
                   {timeAgo(r.completedAt)} · {out.pageCount ?? '?'} pages
                 </div>
               </div>
-              <Badge tone={out.mode === 'final' ? 'ok' : 'gold'}>{out.mode ?? 'draft'}</Badge>
+              <Badge tone={out.mode === 'final' ? 'ok' : 'warn'}>{out.mode ?? 'draft'}</Badge>
               {asset && (
                 <Button size="icon" variant="ghost" title="Download" aria-label="Download PDF" onClick={() => downloadAsset(repo, asset).catch((e) => toast(errMsg(e), 'err'))}>
                   <Download className="size-4" />

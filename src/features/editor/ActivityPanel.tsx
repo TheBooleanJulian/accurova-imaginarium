@@ -10,8 +10,8 @@ import { useEditor } from './editorContext';
 type Tab = 'jobs' | 'comments' | 'activity' | 'errors';
 
 const JOB_ICON: Record<JobStatus, ReactElement> = {
-  queued: <Clock className="size-3.5 text-gold" />,
-  running: <Loader2 className="size-3.5 animate-spin text-teal" />,
+  queued: <Clock className="size-3.5 text-magenta" />,
+  running: <Loader2 className="size-3.5 animate-spin text-cyan" />,
   succeeded: <CheckCircle2 className="size-3.5 text-ok" />,
   failed: <XCircle className="size-3.5 text-err" />,
   cancelled: <Ban className="size-3.5 text-mute" />,
@@ -81,7 +81,7 @@ export function ActivityPanel() {
           >
             {label}
             {count > 0 && (
-              <span className={cn('rounded px-1 font-mono text-[10px]', id === 'errors' ? 'bg-err/15 text-err' : 'bg-teal-dim text-teal')}>{count}</span>
+              <span className={cn('rounded px-1 font-mono text-[10px]', id === 'errors' ? 'bg-err/15 text-err' : 'bg-cyan-dim text-cyan')}>{count}</span>
             )}
           </button>
         ))}
@@ -99,7 +99,7 @@ export function ActivityPanel() {
                     <tr key={j.id} className="border-b border-line/50 last:border-0 hover:bg-raised/50">
                       <td className="w-6 py-1.5 pl-1">{JOB_ICON[j.status]}</td>
                       <td className="py-1.5">
-                        <button className="hover:text-teal" onClick={() => select(j.nodeId)}>
+                        <button className="hover:text-cyan" onClick={() => select(j.nodeId)}>
                           {nodeLabel(j.nodeId)}
                         </button>
                         <span className="ml-1.5 font-mono text-[10.5px] text-mute">{j.operation}</span>
@@ -143,7 +143,7 @@ export function ActivityPanel() {
                         <span className="min-w-0 flex-1 truncate">{c.body}</span>
                         <span className="shrink-0 truncate text-[11px] text-mute">
                           {asset ? `on ${asset.label}` : c.nodeId ? (
-                            <button className="hover:text-teal" onClick={() => select(c.nodeId!)}>
+                            <button className="hover:text-cyan" onClick={() => select(c.nodeId!)}>
                               on {nodeLabel(c.nodeId)}
                             </button>
                           ) : null}
@@ -186,7 +186,7 @@ export function ActivityPanel() {
               {failed.map((j) => (
                 <div key={j.id} className="flex items-start gap-2 rounded-md px-2 py-1.5 hover:bg-raised/50">
                   <XCircle className="mt-0.5 size-3.5 shrink-0 text-err" />
-                  <button className="shrink-0 text-soft hover:text-teal" onClick={() => select(j.nodeId)}>
+                  <button className="shrink-0 text-soft hover:text-cyan" onClick={() => select(j.nodeId)}>
                     {nodeLabel(j.nodeId)}
                   </button>
                   <span className="min-w-0 flex-1 text-err">{j.error?.message}</span>

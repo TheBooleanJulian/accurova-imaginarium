@@ -66,7 +66,7 @@ export function ShareDialog({ open, onClose, bundle }: { open: boolean; onClose:
       <div className="space-y-6">
         <form onSubmit={invite} className="space-y-3 rounded-xl border border-line bg-ink p-4">
           <div className="flex items-center gap-2 text-sm font-medium">
-            <UserPlus className="size-4 text-teal" /> Invite someone
+            <UserPlus className="size-4 text-cyan" /> Invite someone
           </div>
           <div className="grid gap-3 sm:grid-cols-[1fr_180px_auto] sm:items-end">
             <Field label="Email">
@@ -85,16 +85,16 @@ export function ShareDialog({ open, onClose, bundle }: { open: boolean; onClose:
           </div>
           <p className="text-[11px] text-mute">{ROLE_HELP[role]} The link only works for this email address.</p>
           {created && (
-            <div className="flex flex-wrap items-center gap-2 rounded-lg border border-teal/30 bg-teal-dim p-2.5 text-[12px]">
-              <Link2 className="size-3.5 text-teal" />
+            <div className="flex flex-wrap items-center gap-2 rounded-lg border border-cyan/30 bg-cyan-dim p-2.5 text-[12px]">
+              <Link2 className="size-3.5 text-cyan" />
               <span className="min-w-0 flex-1 truncate font-mono text-[11px]">{shareUrl(`/invite/${created.token}`)}</span>
               <CopyLink inv={created} />
             </div>
           )}
           {repo.authMode !== 'supabase' && (
-            <p className="text-[11px] text-gold">
+            <p className="text-[11px] text-warn">
               {repo.mode === 'local'
-                ? 'Local mode: everyone shares this browser. Open the link, sign in as the invited email, and you’ll see exactly what your client sees.'
+                ? 'Demo mode: everyone shares this browser. Open the link, sign in as the invited email, and you’ll see exactly what your client sees.'
                 : 'Dev sign-in: open the link in a private window and sign in as the invited email to see exactly what your client sees.'}
             </p>
           )}
@@ -104,7 +104,7 @@ export function ShareDialog({ open, onClose, bundle }: { open: boolean; onClose:
           <div className="label-mono">People with access · {bundle.members.length}</div>
           {bundle.members.map((m) => (
             <div key={m.id} className="flex flex-wrap items-center gap-3 rounded-lg border border-line px-3 py-2">
-              <div className="flex size-8 items-center justify-center rounded-full bg-raised text-[12px] font-semibold text-teal">
+              <div className="flex size-8 items-center justify-center rounded-full bg-raised text-[12px] font-semibold text-cyan">
                 {(m.displayName ?? m.email ?? '?').slice(0, 1).toUpperCase()}
               </div>
               <div className="min-w-0 flex-1">
@@ -114,7 +114,7 @@ export function ShareDialog({ open, onClose, bundle }: { open: boolean; onClose:
                 <div className="truncate font-mono text-[11px] text-mute">{m.email}</div>
               </div>
               {m.role === 'owner' ? (
-                <Badge tone="gold">Owner</Badge>
+                <Badge tone="cyan">Owner</Badge>
               ) : (
                 <>
                   <Select

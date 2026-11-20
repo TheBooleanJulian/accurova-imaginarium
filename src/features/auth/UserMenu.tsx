@@ -1,14 +1,16 @@
 import { useEffect, useRef, useState } from 'react';
-import { ChevronDown, LogOut, UserRound, Users } from 'lucide-react';
+import { ChevronDown, LogOut, Monitor, Moon, Sun, UserRound, Users } from 'lucide-react';
 import type { Profile } from '@/core/types';
 import { useRepo } from '@/lib/repoContext';
 import { Badge, Button } from '@/components/ui';
 import { navigate } from '@/lib/router';
+import { getTheme, setTheme, type ThemeChoice } from '@/lib/theme';
 
 export function UserMenu() {
   const { repo, user, refreshUser } = useRepo();
   const [open, setOpen] = useState(false);
   const [profiles, setProfiles] = useState<Profile[]>([]);
+  const [theme, setThemeState] = useState<ThemeChoice>(getTheme);
   const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -33,7 +35,7 @@ export function UserMenu() {
   return (
     <div className="relative" ref={ref}>
       <Button variant="ghost" size="sm" onClick={() => setOpen((v) => !v)} className="gap-2">
-        <span className="flex size-6 items-center justify-center rounded-full bg-raised text-[11px] font-semibold text-teal">
+        <span className="flex size-6 items-center justify-center rounded-full bg-raised text-[11px] font-semibold text-cyan">
           {user.displayName.slice(0, 1).toUpperCase()}
         </span>
         <span className="hidden max-w-[140px] truncate sm:inline">{user.displayName}</span>
@@ -48,7 +50,7 @@ export function UserMenu() {
           {repo.listLocalProfiles && (
             <>
               <div className="mt-1 border-t border-line px-2 pt-2 label-mono flex items-center gap-1.5">
-                <Users className="size-3" /> Switch account <Badge>{repo.mode === 'local' ? 'local mode' : 'dev login'}</Badge>
+                <Users className="size-3" /> Switch account <Badge>{repo.mode === 'local' ? 'demo' : 'dev login'}</Badge>
               </div>
               <div className="max-h-56 overflow-auto py-1">
                 {profiles
@@ -64,6 +66,24 @@ export function UserMenu() {
               </div>
             </>
           )}
+          <div className="mt-1 border-t border-line px-2 pb-1 pt-2">
+            <div className="label-mono mb-1.5">Theme</div>
+            <div className="flex gap-1">
+              {([['system', Monitor, 'System'], ['dark', Moon, 'Dark'], ['light', Sun, 'Light']] as const).map(([v, Icon, label]) => (
+                <button
+                  key={v}
+                  onClick={() => {
+                    setTheme(v);
+                    setThemeState(v);
+                  }}
+                  aria-pressed={theme === v}
+                  className={`flex flex-1 items-center justify-center gap-1 rounded-lg border px-2 py-1 text-xs ${theme === v ? 'border-cyan/60 bg-cyan-dim text-cyan' : 'border-line text-soft hover:bg-raised'}`}
+                >
+                  <Icon className="size-3" /> {label}
+                </button>
+              ))}
+            </div>
+          </div>
           <button
             onClick={async () => {
               await repo.signOut();

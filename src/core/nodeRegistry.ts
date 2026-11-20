@@ -66,7 +66,7 @@ export const NODE_DEFS: Record<NodeType, NodeDef> = {
     label: 'Brief',
     description: 'Campaign requirements: client, product, audience, objective, style, deliverables, constraints.',
     category: 'Inputs',
-    accent: '#F5C842',
+    accent: 'var(--magenta-ink)',
     inputs: [],
     outputs: [{ id: 'brief', label: 'Brief', type: 'brief' }],
     configSchema: BriefSchema,
@@ -79,7 +79,7 @@ export const NODE_DEFS: Record<NodeType, NodeDef> = {
     label: 'Image assets',
     description: 'Real product photos, brand assets or inspiration references. Originals are preserved.',
     category: 'Inputs',
-    accent: '#F5C842',
+    accent: 'var(--cyan-ink)',
     inputs: [],
     outputs: [{ id: 'images', label: 'Images', type: 'images' }],
     configSchema: z.object({
@@ -97,7 +97,7 @@ export const NODE_DEFS: Record<NodeType, NodeDef> = {
     label: 'Reference analysis',
     description: 'Reads composition, lighting, colour, background, pose and styling from references.',
     category: 'AI',
-    accent: '#00D4C8',
+    accent: 'var(--cyan-ink)',
     inputs: [
       { id: 'images', label: 'References', type: 'images', multiple: true, required: true },
       { id: 'brief', label: 'Brief', type: 'brief' },
@@ -119,7 +119,7 @@ export const NODE_DEFS: Record<NodeType, NodeDef> = {
     label: 'Text / direction',
     description: 'Editable creative direction, art-direction notes or instructions.',
     category: 'Inputs',
-    accent: '#9AA4B2',
+    accent: 'var(--ink-muted)',
     inputs: [],
     outputs: [{ id: 'text', label: 'Text', type: 'text' }],
     configSchema: z.object({ title: z.string().default('Creative notes'), text: z.string().default('') }),
@@ -133,7 +133,7 @@ export const NODE_DEFS: Record<NodeType, NodeDef> = {
     label: 'Concept generator',
     description: 'Three structured creative directions, then concept images for the chosen one.',
     category: 'AI',
-    accent: '#00D4C8',
+    accent: 'var(--cyan-ink)',
     inputs: [
       { id: 'brief', label: 'Brief', type: 'brief', required: true },
       { id: 'analysis', label: 'Analysis', type: 'analysis' },
@@ -171,7 +171,7 @@ export const NODE_DEFS: Record<NodeType, NodeDef> = {
     label: 'Pose variations',
     description: 'Varies pose and gesture while holding product, styling, lighting and background steady.',
     category: 'AI',
-    accent: '#00D4C8',
+    accent: 'var(--cyan-ink)',
     inputs: [
       { id: 'images', label: 'Source concept', type: 'images', multiple: true, required: true },
       { id: 'direction', label: 'Direction', type: 'direction' },
@@ -205,7 +205,7 @@ export const NODE_DEFS: Record<NodeType, NodeDef> = {
     label: 'Image edit',
     description: 'Edits a concept while preserving the attributes you lock. Creates a new version.',
     category: 'AI',
-    accent: '#00D4C8',
+    accent: 'var(--cyan-ink)',
     inputs: [{ id: 'images', label: 'Source', type: 'images', multiple: true, required: true }],
     outputs: [{ id: 'images', label: 'Edited', type: 'images' }],
     configSchema: z.object({
@@ -235,7 +235,7 @@ export const NODE_DEFS: Record<NodeType, NodeDef> = {
     label: 'Shot planner',
     description: 'Turns concepts into a practical shot list, lighting plan and equipment checklist.',
     category: 'AI',
-    accent: '#00D4C8',
+    accent: 'var(--cyan-ink)',
     inputs: [
       { id: 'direction', label: 'Direction', type: 'direction' },
       { id: 'images', label: 'Approved refs', type: 'images', multiple: true },
@@ -272,7 +272,7 @@ export const NODE_DEFS: Record<NodeType, NodeDef> = {
     label: 'Client approval',
     description: 'Gate for client review. Only approved versions flow out.',
     category: 'Review & output',
-    accent: '#7CE38B',
+    accent: 'var(--success)',
     inputs: [
       { id: 'images', label: 'For review', type: 'images', multiple: true, required: true },
       { id: 'direction', label: 'Direction', type: 'direction' },
@@ -292,7 +292,7 @@ export const NODE_DEFS: Record<NodeType, NodeDef> = {
     label: 'Export pack',
     description: 'Accurova-branded PDF moodboard and production pack.',
     category: 'Review & output',
-    accent: '#7CE38B',
+    accent: 'var(--success)',
     inputs: [
       { id: 'approved', label: 'Approved', type: 'approved' },
       { id: 'images', label: 'Images (draft)', type: 'images', multiple: true },

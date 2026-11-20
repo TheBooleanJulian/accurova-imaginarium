@@ -52,7 +52,7 @@ export function WorkflowGuide() {
           <span className="text-sm text-mute">of {steps.length} steps</span>
         </div>
         <div className="mt-2 h-1 overflow-hidden rounded-full bg-raised">
-          <div className="h-full rounded-full bg-teal transition-all" style={{ width: `${(doneCount / steps.length) * 100}%` }} />
+          <div className="h-full rounded-full bg-cyan transition-all" style={{ width: `${(doneCount / steps.length) * 100}%` }} />
         </div>
       </div>
       <ol className="min-h-0 flex-1 space-y-0.5 overflow-y-auto p-2">
@@ -64,13 +64,13 @@ export function WorkflowGuide() {
               onClick={() => s.node && select(s.node.id)}
               className={cn(
                 'flex w-full gap-2.5 rounded-lg px-2.5 py-2 text-left transition enabled:hover:bg-raised',
-                i === nextIdx && 'bg-teal-dim ring-1 ring-teal/25',
+                i === nextIdx && 'bg-cyan-dim ring-1 ring-cyan/25',
               )}
             >
               {s.done ? (
                 <CheckCircle2 className="mt-0.5 size-4 shrink-0 text-ok" />
               ) : i === nextIdx ? (
-                <CircleDot className="mt-0.5 size-4 shrink-0 text-teal" />
+                <CircleDot className="mt-0.5 size-4 shrink-0 text-cyan" />
               ) : (
                 <Circle className="mt-0.5 size-4 shrink-0 text-line-2" />
               )}
