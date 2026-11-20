@@ -4,7 +4,7 @@ import { SubmitError } from '@/core/jobEngine';
 import type { LocalRepository } from '@/data/local/localRepository';
 
 async function setupProject(repo: LocalRepository) {
-  await repo.signIn('julian@accurova.local');
+  await repo.signIn('demo@imaginarium.local');
   const project = await repo.createProject({ name: 'Watch launch', client: 'Acme', template: 'campaign', brief: { product: 'Field watch', objective: 'Launch' } });
   const bundle = await repo.loadProject(project.id);
   return { project, bundle };

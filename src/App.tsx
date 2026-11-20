@@ -17,9 +17,18 @@ function FullScreenSpinner() {
   );
 }
 
+function DemoBanner() {
+  return (
+    <div role="status" className="flex h-6 shrink-0 items-center justify-center gap-2 border-b border-line bg-panel px-3 font-mono text-[10px] uppercase tracking-wider text-soft">
+      <span className="rounded border border-warn/40 bg-warn/10 px-1.5 text-warn">Demo</span>
+      <span className="truncate">Mock AI placeholders · data stays in this browser · not the live service</span>
+    </div>
+  );
+}
+
 export function App() {
   const path = usePath();
-  const { user, userLoaded } = useRepo();
+  const { repo, user, userLoaded } = useRepo();
 
   useEffect(() => {
     document.title = 'Accurova Imaginarium';
@@ -43,9 +52,14 @@ export function App() {
   }
 
   return (
-    <>
-      <Suspense fallback={<FullScreenSpinner />}>{page}</Suspense>
+    <div className="flex h-full flex-col">
+      {repo.mode === 'local' && <DemoBanner />}
+      <div className="relative min-h-0 flex-1">
+        <div className="absolute inset-0">
+          <Suspense fallback={<FullScreenSpinner />}>{page}</Suspense>
+        </div>
+      </div>
       <Toaster />
-    </>
+    </div>
   );
 }

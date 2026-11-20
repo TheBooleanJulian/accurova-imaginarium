@@ -65,8 +65,8 @@ export function OpControls({ node, only }: { node: GraphNode; only?: string[] })
                   {s?.freshness === 'stale' && <Badge tone="warn">stale · inputs changed</Badge>}
                   {fresh && <Badge tone="ok">up to date</Badge>}
                   {s?.freshness === 'never_run' && <Badge>not run</Badge>}
-                  {s?.newerCandidate && <Badge tone="gold">newer version held back</Badge>}
-                  {active && <Badge tone="teal">{job.status}{job.attempts > 1 ? ` · attempt ${job.attempts}` : ''}</Badge>}
+                  {s?.newerCandidate && <Badge tone="warn">newer version held back</Badge>}
+                  {active && <Badge tone="cyan">{job.status}{job.attempts > 1 ? ` · attempt ${job.attempts}` : ''}</Badge>}
                   {!active && job?.status === 'failed' && <Badge tone="err">failed</Badge>}
                 </div>
               </div>
@@ -110,7 +110,7 @@ export function RunHistory({ node, op, update, renderOutput }: { node: GraphNode
           const job = bundle.jobs.find((j) => j.id === r.jobId);
           const isActive = r.id === activeId;
           return (
-            <div key={r.id} className={cn('rounded-lg border p-2', isActive ? 'border-teal/50 bg-teal-dim' : 'border-line')}>
+            <div key={r.id} className={cn('rounded-lg border p-2', isActive ? 'border-cyan/50 bg-cyan-dim' : 'border-line')}>
               <div className="flex items-center gap-2 text-[11px]">
                 <span className="font-mono text-soft">v{runs.length - i}</span>
                 <span className="text-mute">{timeAgo(r.completedAt)}</span>
@@ -118,7 +118,7 @@ export function RunHistory({ node, op, update, renderOutput }: { node: GraphNode
                 {r.inputHash !== statuses[node.id]?.ops[op]?.currentHash && <Badge tone="warn">old inputs</Badge>}
                 <span className="ml-auto flex items-center gap-1">
                   {isActive ? (
-                    <Badge tone="teal">{pinned === r.id ? 'pinned' : 'active'}</Badge>
+                    <Badge tone="cyan">{pinned === r.id ? 'pinned' : 'active'}</Badge>
                   ) : (
                     canEdit && (
                       <Button size="sm" variant="ghost" onClick={() => update({ pinned: { ...(node.data.pinned as object), [op]: r.id }, selectedAssetIds: [] })}>
@@ -187,11 +187,11 @@ export function SourcePicker({ node, update, images }: InspectorProps & { images
             type="button"
             disabled={!canEdit}
             onClick={() => update({ sourceAssetId: i.assetId })}
-            className={cn('relative aspect-square overflow-hidden rounded-md border', on ? 'border-teal ring-1 ring-teal/50' : 'border-line opacity-70 hover:opacity-100')}
+            className={cn('relative aspect-square overflow-hidden rounded-md border', on ? 'border-cyan ring-1 ring-cyan/50' : 'border-line opacity-70 hover:opacity-100')}
             title={a.label ?? ''}
           >
             <ImageThumb asset={a} />
-            {on && <span className="absolute inset-x-0 bottom-0 bg-teal/90 py-0.5 text-center font-mono text-[9px] font-semibold text-void">SOURCE</span>}
+            {on && <span className="absolute inset-x-0 bottom-0 bg-cyan/90 py-0.5 text-center font-mono text-[9px] font-semibold text-void">SOURCE</span>}
           </button>
         );
       })}

@@ -56,7 +56,7 @@ export function Canvas() {
         const src = nodes.find((n) => n.id === e.source);
         const port = src ? findPort(src.type, 'out', e.sourcePort) : undefined;
         const running = statuses[e.target]?.state === 'running';
-        const color = port ? PORT_COLORS[port.type] : '#3a4656';
+        const color = port ? PORT_COLORS[port.type] : 'var(--line-strong)';
         return {
           id: e.id,
           source: e.source,
@@ -65,7 +65,7 @@ export function Canvas() {
           targetHandle: e.targetPort,
           selected: selectedEdges.has(e.id),
           animated: running,
-          style: { stroke: selectedEdges.has(e.id) ? '#00D4C8' : `${color}99` },
+          style: { stroke: selectedEdges.has(e.id) ? 'var(--cyan-ink)' : `color-mix(in srgb, ${color} 60%, transparent)` },
         };
       }),
     [edges, nodes, statuses, selectedEdges],
@@ -173,7 +173,7 @@ export function Canvas() {
         attributionPosition="top-right"
         colorMode="dark"
       >
-        <Background variant={BackgroundVariant.Dots} gap={22} size={1.2} color="#1d2632" />
+        <Background variant={BackgroundVariant.Dots} gap={22} size={1.2} color="var(--line)" />
         <Controls showInteractive={false} position="bottom-left" />
         <MiniMap
           position="bottom-right"

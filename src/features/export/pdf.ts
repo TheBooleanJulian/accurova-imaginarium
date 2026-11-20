@@ -38,9 +38,9 @@ export interface PackResult {
 const W = 297;
 const H = 210;
 const M = 14;
-const TEAL: [number, number, number] = [0, 212, 200];
-const GOLD: [number, number, number] = [245, 200, 66];
-const VOID: [number, number, number] = [5, 5, 8];
+const TEAL: [number, number, number] = [0, 229, 255];
+const GOLD: [number, number, number] = [255, 43, 214];
+const VOID: [number, number, number] = [5, 6, 13];
 const INK: [number, number, number] = [24, 28, 36];
 const MUTE: [number, number, number] = [110, 118, 130];
 const PAPER: [number, number, number] = [248, 247, 243];

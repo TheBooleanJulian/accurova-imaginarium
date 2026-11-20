@@ -137,7 +137,7 @@ function Review({ bundle }: { bundle: ProjectBundle }) {
             </button>
           )}
           <div className="ml-auto flex items-center gap-2">
-            <Badge tone="teal">{ROLE_LABELS[bundle.myRole]}</Badge>
+            <Badge tone="cyan">{ROLE_LABELS[bundle.myRole]}</Badge>
             <UserMenu />
           </div>
         </div>
@@ -162,7 +162,7 @@ function Review({ bundle }: { bundle: ProjectBundle }) {
             </div>
           )}
           {latestFinal && (
-            <Button variant="gold" onClick={() => downloadAsset(repo, latestFinal).catch((e) => toast(errMsg(e), 'err'))}>
+            <Button variant="magenta" onClick={() => downloadAsset(repo, latestFinal).catch((e) => toast(errMsg(e), 'err'))}>
               <Download className="size-4" /> Download approved preshoot pack
             </Button>
           )}
@@ -219,7 +219,7 @@ function Review({ bundle }: { bundle: ProjectBundle }) {
                     <div className="truncate text-sm">{a.label}</div>
                     <div className="font-mono text-[11px] text-mute">{timeAgo(a.createdAt)}</div>
                   </div>
-                  <Badge tone={exportMode(a) === 'final' ? 'ok' : 'gold'}>{exportMode(a)}</Badge>
+                  <Badge tone={exportMode(a) === 'final' ? 'ok' : 'warn'}>{exportMode(a)}</Badge>
                   <Button size="sm" variant="outline" onClick={() => downloadAsset(repo, a).catch((e) => toast(errMsg(e), 'err'))}>
                     <Download className="size-3.5" /> PDF
                   </Button>
@@ -259,7 +259,7 @@ function DirectionCard({ d }: { d: DirectionValue }) {
             </span>
           ))}
         </div>
-        <button className="inline-flex items-center gap-1 text-[13px] text-teal hover:underline" onClick={() => setMore(!more)}>
+        <button className="inline-flex items-center gap-1 text-[13px] text-cyan hover:underline" onClick={() => setMore(!more)}>
           <ChevronDown className={cn('size-3.5 transition', more && 'rotate-180')} /> {more ? 'Less' : 'Lighting, poses and set'}
         </button>
         {more && (
@@ -300,9 +300,9 @@ function ShotList({ plan, bundle }: { plan: ShotPlan; bundle: ProjectBundle }) {
               {ref ? <AssetImage asset={ref} className="size-16 shrink-0 rounded-lg border border-line" thumb /> : <div className="size-16 shrink-0 rounded-lg border border-dashed border-line" />}
               <div className="min-w-0 flex-1 space-y-1">
                 <div className="flex min-w-0 items-center gap-2">
-                  <span className="shrink-0 font-mono text-[11px] text-teal">{s.id}</span>
+                  <span className="shrink-0 font-mono text-[11px] text-cyan">{s.id}</span>
                   <span className="min-w-0 truncate text-[13.5px] font-medium">{s.title}</span>
-                  <Badge tone={s.priority === 'must' ? 'gold' : s.priority === 'should' ? 'teal' : 'mute'} className="ml-auto shrink-0">
+                  <Badge tone={s.priority === 'must' ? 'magenta' : s.priority === 'should' ? 'cyan' : 'mute'} className="ml-auto shrink-0">
                     {s.priority}
                   </Badge>
                 </div>

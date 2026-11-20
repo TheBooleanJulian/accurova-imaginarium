@@ -113,10 +113,10 @@ export function ConceptInspector({ node, update }: InspectorProps) {
                 type="button"
                 disabled={!canEdit}
                 onClick={() => update({ selectedDirection: i })}
-                className={cn('w-full rounded-xl border p-3 text-left transition', sel === i ? 'border-teal/70 bg-teal-dim' : 'border-line hover:border-line-2')}
+                className={cn('w-full rounded-xl border p-3 text-left transition', sel === i ? 'border-cyan/70 bg-cyan-dim' : 'border-line hover:border-line-2')}
               >
                 <div className="flex items-center gap-2">
-                  {sel === i ? <CheckCircle2 className="size-4 text-teal" /> : <Circle className="size-4 text-mute" />}
+                  {sel === i ? <CheckCircle2 className="size-4 text-cyan" /> : <Circle className="size-4 text-mute" />}
                   <span className="font-medium">{d.title}</span>
                   <span className="ml-auto flex gap-0.5">{d.palette.map((c) => <span key={c} className="size-3 rounded-sm border border-line" style={{ background: c }} />)}</span>
                 </div>

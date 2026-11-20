@@ -124,6 +124,16 @@ NODE_ENV=production npm start     # serves dist/ + API + worker on $PORT
 
 Put it behind a reverse proxy with HTTPS (Caddy or nginx). Use `pm2` or a `systemd` unit to keep it running. With `STORAGE=local`, back up `DATA_DIR`. With Supabase, the server is stateless. You can run several instances: they share the queue safely.
 
+### Option C: Cloudflare Workers (browser-only demo)
+
+This is what runs at https://imaginarium.accurova.com. `wrangler.jsonc` serves the built `dist/` as static assets (mock AI, data in the visitor's browser, clearly labelled as a demo). Server mode is not part of this deployment.
+
+```bash
+npm ci && npm run build && npx wrangler deploy
+```
+
+Status, pending tasks and deploy notes: [progress.md](progress.md).
+
 ### Option B: Vercel (frontend + API function) + Supabase
 
 `vercel.json` builds the static app into `dist/` and the API into `api/index.mjs` (rewrites send `/api/*` there). Set the env vars in Vercel (including `VITE_BACKEND=server` and `CRON_SECRET`), and use Supabase's **transaction pooler** URL (port 6543).
@@ -133,7 +143,7 @@ Put it behind a reverse proxy with HTTPS (Caddy or nginx). Use `pm2` or a `syste
 
 ### Migrating off Zeabur
 
-Option A suits a VPS such as SGserver01. Option B suits a fully managed setup. Both use the same build; only env vars differ.
+This app was never on Zeabur. Option A suits a VPS such as SGserver01. Option B suits a fully managed setup. Both use the same build; only env vars differ.
 
 ## Security model
 
